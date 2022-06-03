@@ -58,7 +58,7 @@ module "kms" {
   source                  = "github.com/champ-oss/terraform-aws-kms.git?ref=v1.0.7-53eaba9"
   git                     = local.git
   name                    = "alias/${local.git}-${random_string.this.result}"
-  deletion_window_in_days = 1
+  deletion_window_in_days = 7
   account_actions         = []
 }
 
