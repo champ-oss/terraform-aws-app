@@ -62,12 +62,12 @@ module "kms" {
   account_actions         = []
 }
 
-data "aws_kms_ciphertext" "secret1" {
+resource "aws_kms_ciphertext" "secret1" {
   key_id    = module.kms.key_id
   plaintext = "kms secret 1"
 }
 
-data "aws_kms_ciphertext" "secret2" {
+resource "aws_kms_ciphertext" "secret2" {
   key_id    = module.kms.key_id
   plaintext = "kms secret 2"
 }
@@ -123,10 +123,10 @@ module "this" {
   }
 
   kms_secrets = {
-    KMSTEST1 = data.aws_kms_ciphertext.secret1.ciphertext_blob
-    KMSTEST2 = data.aws_kms_ciphertext.secret2.ciphertext_blob
+    KMSTEST1 = aws_kms_ciphertext.secret1.ciphertext_blob
+    KMSTEST2 = aws_kms_ciphertext.secret2.ciphertext_blob
 
     # Test overriding a ssm "secret" with a "kms_secret"
-    SSMTEST2 = data.aws_kms_ciphertext.secret2.ciphertext_blob
+    SSMTEST2 = aws_kms_ciphertext.secret2.ciphertext_blob
   }
 }
