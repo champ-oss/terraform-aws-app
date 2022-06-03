@@ -59,6 +59,7 @@ module "kms" {
   git                     = local.git
   name                    = "alias/${local.git}-${random_string.this.result}"
   deletion_window_in_days = 1
+  account_actions         = []
 }
 
 data "aws_kms_ciphertext" "secret1" {
