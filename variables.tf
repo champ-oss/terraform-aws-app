@@ -210,7 +210,7 @@ variable "filter_pattern" {
 variable "slack_url" {
   description = "slack url"
   type        = string
-  default     = "https://hooks.slack.com/services/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"
+  default     = "https://hooks.slack.com/services/abc123"
 }
 
 variable "alert_region" {
