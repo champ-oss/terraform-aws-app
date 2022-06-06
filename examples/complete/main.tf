@@ -24,7 +24,7 @@ resource "random_string" "this" {
 }
 
 module "vpc" {
-  source                   = "github.com/champ-oss/terraform-aws-vpc.git?ref=v1.0.13-58fcd2a"
+  source                   = "github.com/champ-oss/terraform-aws-vpc.git?ref=v1.0.15-baab48e"
   git                      = local.git
   availability_zones_count = 2
   retention_in_days        = 1
