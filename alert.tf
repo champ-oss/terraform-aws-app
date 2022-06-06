@@ -1,6 +1,6 @@
 module "lambda_cloudwatch_alert" {
   count          = var.enable_lambda_cw_alert ? 1 : 0
-  source         = "github.com/champ-oss/terraform-aws-alert.git?ref=v1.0.7-0ff81e7"
+  source         = "github.com/champ-oss/terraform-aws-alert.git?ref=v1.0.32-83f2f0e"
   git            = var.git
   log_group_name = aws_cloudwatch_log_group.this.name
   name           = var.name
