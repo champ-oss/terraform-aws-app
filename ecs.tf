@@ -47,7 +47,6 @@ resource "aws_ecs_task_definition" "this" {
 }
 
 resource "aws_ecs_service" "this" {
-  count                             = var.enable_load_balancer ? 1 : 0
   name                              = var.name
   cluster                           = var.cluster
   task_definition                   = aws_ecs_task_definition.this.arn
@@ -60,29 +59,14 @@ resource "aws_ecs_service" "this" {
   tags                              = merge(local.tags, var.tags)
   enable_execute_command            = var.enable_execute_command
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.this.id
-    container_name   = local.container[0].name
-    container_port   = var.port
+  dynamic "load_balancer" {
+    for_each = var.enable_load_balancer ? [1] : []
+    content {
+      target_group_arn = aws_lb_target_group.this.id
+      container_name   = local.container[0].name
+      container_port   = var.port
+    }
   }
-
-  network_configuration {
-    security_groups = var.security_groups
-    subnets         = var.subnets
-  }
-}
-
-resource "aws_ecs_service" "disabled_load_balancer" {
-  count                  = var.enable_load_balancer ? 0 : 1
-  name                   = var.name
-  cluster                = var.cluster
-  task_definition        = aws_ecs_task_definition.this.arn
-  desired_count          = var.desired_count
-  launch_type            = "FARGATE"
-  propagate_tags         = "SERVICE"
-  wait_for_steady_state  = var.wait_for_steady_state
-  tags                   = merge(local.tags, var.tags)
-  enable_execute_command = var.enable_execute_command
 
   network_configuration {
     security_groups = var.security_groups
