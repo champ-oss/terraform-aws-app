@@ -218,3 +218,39 @@ variable "alert_region" {
   type        = string
   default     = "us-east-2"
 }
+
+variable "enable_autoscaling" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy"
+  type        = bool
+  default     = false
+}
+
+variable "max_capacity" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_target#max_capacity"
+  type        = number
+  default     = 10
+}
+
+variable "min_capacity" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_target#min_capacity"
+  type        = number
+  default     = 1
+}
+
+variable "autoscaling_target_cpu" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy#target_value"
+  type        = number
+  default     = 75
+}
+
+variable "scale_in_cooldown" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy#scale_in_cooldown"
+  type        = number
+  default     = 60
+}
+
+variable "scale_out_cooldown" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy#scale_out_cooldown"
+  type        = number
+  default     = 60
+}
