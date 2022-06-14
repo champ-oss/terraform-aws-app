@@ -144,6 +144,6 @@ module "autoscale" {
   enable_autoscaling   = true
   name                 = "autoscale"
   image                = "danielsantos/cpustress"
-  cpu                  = 245
+  cpu                  = 256
   memory               = 512
 }
