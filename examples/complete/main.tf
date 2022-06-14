@@ -146,4 +146,6 @@ module "autoscale" {
   image                = "danielsantos/cpustress"
   cpu                  = 256
   memory               = 512
+  scale_in_cooldown    = 30
+  scale_out_cooldown   = 30
 }
