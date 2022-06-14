@@ -32,7 +32,7 @@ module "vpc" {
 }
 
 module "acm" {
-  source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.33-60460c3"
+  source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.42-b0ce355"
   git               = local.git
   domain_name       = "${local.git}.${data.aws_route53_zone.this.name}"
   create_wildcard   = false
@@ -41,7 +41,7 @@ module "acm" {
 }
 
 module "core" {
-  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.3-42a0b4b"
+  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.19-6360d97"
   git                       = local.git
   name                      = local.git
   vpc_id                    = module.vpc.vpc_id
@@ -55,7 +55,7 @@ module "core" {
 }
 
 module "kms" {
-  source                  = "github.com/champ-oss/terraform-aws-kms.git?ref=v1.0.8-3a2c97e"
+  source                  = "github.com/champ-oss/terraform-aws-kms.git?ref=v1.0.10-14e33df"
   git                     = local.git
   name                    = "alias/${local.git}-${random_string.this.result}"
   deletion_window_in_days = 7
