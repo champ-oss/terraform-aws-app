@@ -1,14 +1,12 @@
 resource "aws_appautoscaling_target" "this" {
-  count              = var.enable_autoscaling ? 1 : 0
-  max_capacity       = var.max_capacity
-  min_capacity       = var.min_capacity
+  max_capacity       = var.desired_count != null ? var.desired_count : var.max_capacity
+  min_capacity       = var.desired_count != null ? var.desired_count : var.min_capacity
   resource_id        = "service/${var.cluster}/${var.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 }
 
 resource "aws_appautoscaling_policy" "this" {
-  count              = var.enable_autoscaling ? 1 : 0
   name               = "${var.git}-${var.name}"
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.this[0].resource_id

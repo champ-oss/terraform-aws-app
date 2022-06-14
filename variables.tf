@@ -139,7 +139,7 @@ variable "memory" {
 variable "desired_count" {
   description = "https://www.terraform.io/docs/providers/aws/r/ecs_service.html#desired_count"
   type        = number
-  default     = 1
+  default     = null
 }
 
 variable "retention_in_days" {
@@ -228,7 +228,7 @@ variable "enable_autoscaling" {
 variable "max_capacity" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_target#max_capacity"
   type        = number
-  default     = 10
+  default     = 1
 }
 
 variable "min_capacity" {
