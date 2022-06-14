@@ -1,4 +1,5 @@
 resource "aws_appautoscaling_target" "this" {
+  depends_on         = [aws_ecs_service.this, aws_ecs_service.disabled_load_balancer]
   max_capacity       = var.desired_count != null ? var.desired_count : var.max_capacity
   min_capacity       = var.desired_count != null ? var.desired_count : var.min_capacity
   resource_id        = "service/${var.cluster}/${var.name}"
@@ -7,6 +8,7 @@ resource "aws_appautoscaling_target" "this" {
 }
 
 resource "aws_appautoscaling_policy" "this" {
+  depends_on         = [aws_ecs_service.this, aws_ecs_service.disabled_load_balancer]
   name               = "${var.git}-${var.name}"
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.this.resource_id
