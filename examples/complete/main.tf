@@ -141,11 +141,12 @@ module "autoscale" {
   execution_role_arn   = module.core.execution_ecs_role_arn
   enable_load_balancer = false
   enable_route53       = false
-  enable_autoscaling   = true
   name                 = "autoscale"
   image                = "danielsantos/cpustress"
   cpu                  = 256
   memory               = 512
   scale_in_cooldown    = 30
   scale_out_cooldown   = 30
+  min_capacity         = 1
+  max_capacity         = 10
 }

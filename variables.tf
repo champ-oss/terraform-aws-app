@@ -219,12 +219,6 @@ variable "alert_region" {
   default     = "us-east-2"
 }
 
-variable "enable_autoscaling" {
-  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy"
-  type        = bool
-  default     = false
-}
-
 variable "max_capacity" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_target#max_capacity"
   type        = number

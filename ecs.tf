@@ -69,6 +69,10 @@ resource "aws_ecs_service" "this" {
     security_groups = var.security_groups
     subnets         = var.subnets
   }
+
+  lifecycle {
+    ignore_changes = [desired_count]
+  }
 }
 
 resource "aws_ecs_service" "disabled_load_balancer" {
@@ -85,5 +89,9 @@ resource "aws_ecs_service" "disabled_load_balancer" {
   network_configuration {
     security_groups = var.security_groups
     subnets         = var.subnets
+  }
+
+  lifecycle {
+    ignore_changes = [desired_count]
   }
 }
