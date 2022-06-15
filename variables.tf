@@ -139,7 +139,7 @@ variable "memory" {
 variable "desired_count" {
   description = "https://www.terraform.io/docs/providers/aws/r/ecs_service.html#desired_count"
   type        = number
-  default     = 1
+  default     = null
 }
 
 variable "retention_in_days" {
@@ -217,4 +217,34 @@ variable "alert_region" {
   description = "region of cloudwatch alarm"
   type        = string
   default     = "us-east-2"
+}
+
+variable "max_capacity" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_target#max_capacity"
+  type        = number
+  default     = 1
+}
+
+variable "min_capacity" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_target#min_capacity"
+  type        = number
+  default     = 1
+}
+
+variable "autoscaling_target_cpu" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy#target_value"
+  type        = number
+  default     = 75
+}
+
+variable "scale_in_cooldown" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy#scale_in_cooldown"
+  type        = number
+  default     = 60
+}
+
+variable "scale_out_cooldown" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy#scale_out_cooldown"
+  type        = number
+  default     = 60
 }

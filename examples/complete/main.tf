@@ -24,7 +24,7 @@ resource "random_string" "this" {
 }
 
 module "vpc" {
-  source                   = "github.com/champ-oss/terraform-aws-vpc.git?ref=v1.0.15-baab48e"
+  source                   = "github.com/champ-oss/terraform-aws-vpc.git?ref=v1.0.19-7856858"
   git                      = local.git
   availability_zones_count = 2
   retention_in_days        = 1
@@ -32,7 +32,7 @@ module "vpc" {
 }
 
 module "acm" {
-  source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.33-60460c3"
+  source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.42-b0ce355"
   git               = local.git
   domain_name       = "${local.git}.${data.aws_route53_zone.this.name}"
   create_wildcard   = false
@@ -41,7 +41,7 @@ module "acm" {
 }
 
 module "core" {
-  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.16-744c7fd"
+  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.19-6360d97"
   git                       = local.git
   name                      = local.git
   vpc_id                    = module.vpc.vpc_id
@@ -55,7 +55,7 @@ module "core" {
 }
 
 module "kms" {
-  source                  = "github.com/champ-oss/terraform-aws-kms.git?ref=v1.0.8-3a2c97e"
+  source                  = "github.com/champ-oss/terraform-aws-kms.git?ref=v1.0.10-14e33df"
   git                     = local.git
   name                    = "alias/${local.git}-${random_string.this.result}"
   deletion_window_in_days = 7
@@ -87,7 +87,6 @@ resource "aws_ssm_parameter" "secret2" {
 }
 
 module "this" {
-  # environment specific variables
   source             = "../../"
   git                = local.git
   vpc_id             = module.vpc.vpc_id
@@ -129,4 +128,25 @@ module "this" {
     # Test overriding a ssm "secret" with a "kms_secret"
     SSMTEST2 = aws_kms_ciphertext.secret2.ciphertext_blob
   }
+}
+
+module "autoscale" {
+  source               = "../../"
+  git                  = local.git
+  vpc_id               = module.vpc.vpc_id
+  subnets              = module.vpc.private_subnets_ids
+  zone_id              = data.aws_route53_zone.this.zone_id
+  cluster              = module.core.ecs_cluster_name
+  security_groups      = [module.core.ecs_app_security_group]
+  execution_role_arn   = module.core.execution_ecs_role_arn
+  enable_load_balancer = false
+  enable_route53       = false
+  name                 = "autoscale"
+  image                = "danielsantos/cpustress"
+  cpu                  = 256
+  memory               = 512
+  scale_in_cooldown    = 30
+  scale_out_cooldown   = 30
+  min_capacity         = 1
+  max_capacity         = 10
 }

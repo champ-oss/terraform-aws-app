@@ -51,7 +51,6 @@ resource "aws_ecs_service" "this" {
   name                              = var.name
   cluster                           = var.cluster
   task_definition                   = aws_ecs_task_definition.this.arn
-  desired_count                     = var.desired_count
   launch_type                       = "FARGATE"
   propagate_tags                    = "SERVICE"
   health_check_grace_period_seconds = var.health_check_grace_period_seconds
@@ -70,6 +69,10 @@ resource "aws_ecs_service" "this" {
     security_groups = var.security_groups
     subnets         = var.subnets
   }
+
+  lifecycle {
+    ignore_changes = [desired_count]
+  }
 }
 
 resource "aws_ecs_service" "disabled_load_balancer" {
@@ -77,7 +80,6 @@ resource "aws_ecs_service" "disabled_load_balancer" {
   name                   = var.name
   cluster                = var.cluster
   task_definition        = aws_ecs_task_definition.this.arn
-  desired_count          = var.desired_count
   launch_type            = "FARGATE"
   propagate_tags         = "SERVICE"
   wait_for_steady_state  = var.wait_for_steady_state
@@ -87,5 +89,9 @@ resource "aws_ecs_service" "disabled_load_balancer" {
   network_configuration {
     security_groups = var.security_groups
     subnets         = var.subnets
+  }
+
+  lifecycle {
+    ignore_changes = [desired_count]
   }
 }
