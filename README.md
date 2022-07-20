@@ -33,7 +33,7 @@ See the `examples/` folder
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_lambda_cloudwatch_alert"></a> [lambda\_cloudwatch\_alert](#module\_lambda\_cloudwatch\_alert) | github.com/champ-oss/terraform-aws-alert.git | v1.0.82-9da09b5 |
+| <a name="module_lambda_cloudwatch_alert"></a> [lambda\_cloudwatch\_alert](#module\_lambda\_cloudwatch\_alert) | github.com/champ-oss/terraform-aws-alert.git | v1.0.87-2fdf485 |
 
 ## Resources
 
