@@ -24,7 +24,7 @@ resource "random_string" "this" {
 }
 
 module "vpc" {
-  source                   = "github.com/champ-oss/terraform-aws-vpc.git?ref=v1.0.32-86c316d"
+  source                   = "github.com/champ-oss/terraform-aws-vpc.git?ref=v1.0.35-1462786"
   git                      = local.git
   availability_zones_count = 2
   retention_in_days        = 1
@@ -41,7 +41,7 @@ module "acm" {
 }
 
 module "core" {
-  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.84-bd10597"
+  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.87-8d01205"
   git                       = local.git
   name                      = local.git
   vpc_id                    = module.vpc.vpc_id
@@ -55,7 +55,7 @@ module "core" {
 }
 
 module "kms" {
-  source                  = "github.com/champ-oss/terraform-aws-kms.git?ref=v1.0.21-3c8b770"
+  source                  = "github.com/champ-oss/terraform-aws-kms.git?ref=v1.0.24-026589b"
   git                     = local.git
   name                    = "alias/${local.git}-${random_string.this.result}"
   deletion_window_in_days = 7
