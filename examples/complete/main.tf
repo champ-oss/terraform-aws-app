@@ -32,7 +32,7 @@ module "vpc" {
 }
 
 module "acm" {
-  source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.103-75a50fe"
+  source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.105-7d3f10a"
   git               = local.git
   domain_name       = "${local.git}.${data.aws_route53_zone.this.name}"
   create_wildcard   = false
@@ -41,7 +41,7 @@ module "acm" {
 }
 
 module "core" {
-  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.98-d5edc0c"
+  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.101-ae4949a"
   git                       = local.git
   name                      = local.git
   vpc_id                    = module.vpc.vpc_id
