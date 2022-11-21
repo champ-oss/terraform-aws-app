@@ -1,3 +1,7 @@
+terraform {
+  backend "s3" {}
+}
+
 locals {
   git = "terraform-aws-app"
   tags = {
@@ -8,7 +12,37 @@ locals {
 }
 
 provider "aws" {
-  region = "us-west-1"
+  region = "us-east-2"
+}
+
+data "aws_vpcs" "this" {
+  tags = {
+    purpose = "vega"
+  }
+}
+
+data "aws_subnets" "private" {
+  tags = {
+    purpose = "vega"
+    Type    = "Private"
+  }
+
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpcs.this.ids[0]]
+  }
+}
+
+data "aws_subnets" "public" {
+  tags = {
+    purpose = "vega"
+    Type    = "Public"
+  }
+
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpcs.this.ids[0]]
+  }
 }
 
 data "aws_route53_zone" "this" {
@@ -21,14 +55,6 @@ resource "random_string" "this" {
   upper   = false
   lower   = true
   number  = true
-}
-
-module "vpc" {
-  source                   = "github.com/champ-oss/terraform-aws-vpc.git?ref=v1.0.39-9596bfc"
-  git                      = local.git
-  availability_zones_count = 2
-  retention_in_days        = 1
-  create_private_subnets   = true
 }
 
 module "acm" {
@@ -44,9 +70,9 @@ module "core" {
   source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.109-3364502"
   git                       = local.git
   name                      = local.git
-  vpc_id                    = module.vpc.vpc_id
-  public_subnet_ids         = module.vpc.public_subnets_ids
-  private_subnet_ids        = module.vpc.private_subnets_ids
+  vpc_id                    = data.aws_vpcs.this.ids[0]
+  public_subnet_ids         = data.aws_subnets.public.ids
+  private_subnet_ids        = data.aws_subnets.private.ids
   protect                   = false
   log_retention             = "3"
   tags                      = local.tags
@@ -89,8 +115,8 @@ resource "aws_ssm_parameter" "secret2" {
 module "this" {
   source             = "../../"
   git                = local.git
-  vpc_id             = module.vpc.vpc_id
-  subnets            = module.vpc.private_subnets_ids
+  vpc_id             = data.aws_vpcs.this.ids[0]
+  subnets            = data.aws_subnets.private.ids
   zone_id            = data.aws_route53_zone.this.zone_id
   cluster            = module.core.ecs_cluster_name
   security_groups    = [module.core.ecs_app_security_group]
@@ -133,8 +159,8 @@ module "this" {
 module "autoscale" {
   source               = "../../"
   git                  = local.git
-  vpc_id               = module.vpc.vpc_id
-  subnets              = module.vpc.private_subnets_ids
+  vpc_id               = data.aws_vpcs.this.ids[0]
+  subnets              = data.aws_subnets.private.ids
   zone_id              = data.aws_route53_zone.this.zone_id
   cluster              = module.core.ecs_cluster_name
   security_groups      = [module.core.ecs_app_security_group]
