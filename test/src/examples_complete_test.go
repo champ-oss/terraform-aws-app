@@ -14,7 +14,7 @@ import (
 	"testing"
 )
 
-const region = "us-west-1"
+const region = "us-east-2"
 const dns = "terraform-aws-app.oss.champtest.net"
 
 // TestExamplesComplete tests a typical deployment of this module
