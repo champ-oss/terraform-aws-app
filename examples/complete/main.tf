@@ -12,7 +12,7 @@ locals {
 }
 
 provider "aws" {
-  region = "us-west-1"
+  region = "us-east-2"
 }
 
 data "aws_vpcs" "this" {
