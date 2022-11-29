@@ -248,3 +248,27 @@ variable "scale_out_cooldown" {
   type        = number
   default     = 60
 }
+
+variable "deployment_maximum_percent" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service#deployment_maximum_percent"
+  type        = number
+  default     = 200
+}
+
+variable "deployment_minimum_healthy_percent" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service#deployment_minimum_healthy_percent"
+  type        = number
+  default     = 100
+}
+
+variable "deployment_circuit_breaker_enable" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service#enable"
+  type        = bool
+  default     = false
+}
+
+variable "deployment_circuit_breaker_rollback" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service#rollback"
+  type        = bool
+  default     = false
+}
