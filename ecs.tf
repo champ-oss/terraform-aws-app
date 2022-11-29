@@ -83,19 +83,26 @@ resource "aws_ecs_service" "this" {
 }
 
 resource "aws_ecs_service" "disabled_load_balancer" {
-  count                  = var.enable_load_balancer ? 0 : 1
-  name                   = var.name
-  cluster                = var.cluster
-  task_definition        = aws_ecs_task_definition.this.arn
-  launch_type            = "FARGATE"
-  propagate_tags         = "SERVICE"
-  wait_for_steady_state  = var.wait_for_steady_state
-  tags                   = merge(local.tags, var.tags)
-  enable_execute_command = var.enable_execute_command
+  count                              = var.enable_load_balancer ? 0 : 1
+  name                               = var.name
+  cluster                            = var.cluster
+  task_definition                    = aws_ecs_task_definition.this.arn
+  launch_type                        = "FARGATE"
+  propagate_tags                     = "SERVICE"
+  wait_for_steady_state              = var.wait_for_steady_state
+  tags                               = merge(local.tags, var.tags)
+  enable_execute_command             = var.enable_execute_command
+  deployment_maximum_percent         = var.deployment_maximum_percent
+  deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
 
   network_configuration {
     security_groups = var.security_groups
     subnets         = var.subnets
+  }
+
+  deployment_circuit_breaker {
+    enable   = var.deployment_circuit_breaker_enable
+    rollback = var.deployment_circuit_breaker_rollback
   }
 
   lifecycle {
