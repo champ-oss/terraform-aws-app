@@ -272,3 +272,9 @@ variable "deployment_circuit_breaker_rollback" {
   type        = bool
   default     = false
 }
+
+variable "command" {
+  description = "optional command entrypoint for container task definition"
+  type        = list(string)
+  default     = []
+}
