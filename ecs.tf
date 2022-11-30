@@ -14,7 +14,7 @@ locals {
       essential   = true
       environment = [for key, value in merge(var.environment, local.kms_secrets_sha) : { name = key, value = value }]
       secrets     = [for key, value in merge(var.secrets, local.kms_ssm) : { name = key, valueFrom = value }]
-      command     = var.command != [] ? var.command : null
+      command     = var.command
       portMappings = [
         {
           containerPort = var.port
