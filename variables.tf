@@ -278,3 +278,9 @@ variable "command" {
   type        = list(string)
   default     = null
 }
+
+variable "stickiness" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group#stickiness"
+  type        = list(map(any))
+  default     = null
+}

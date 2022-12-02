@@ -15,6 +15,16 @@ resource "aws_lb_target_group" "this" {
     timeout             = var.timeout
   }
 
+  dynamic "stickiness" {
+    for_each = var.stickiness != null ? var.stickiness : []
+    content {
+      enabled         = stickiness.value.enabled
+      type            = stickiness.value.type
+      cookie_name     = try(stickiness.value.cookie_name, null)
+      cookie_duration = stickiness.value.cookie_duration
+    }
+  }
+
   lifecycle {
     create_before_destroy = true
   }

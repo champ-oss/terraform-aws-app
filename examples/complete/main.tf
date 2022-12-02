@@ -126,6 +126,15 @@ module "this" {
   lb_zone_id         = module.core.lb_public_zone_id
   enable_route53     = true
 
+  #
+  /* stickiness example
+  stickiness = [{
+    enabled : true,
+    type : "lb_cookie"
+    cookie_duration : 43200,
+  }]
+  */
+
   # app specific variables
   name                              = "test"
   dns_name                          = "${local.git}.${data.aws_route53_zone.this.name}"
