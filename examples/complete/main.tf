@@ -126,6 +126,24 @@ module "this" {
   lb_zone_id         = module.core.lb_public_zone_id
   enable_route53     = true
 
+  /* stickiness example
+  stickiness = [{
+    enabled : true,
+    type : "lb_cookie"
+    cookie_duration : 43200,
+  }]
+  */
+
+  replication_specs = [{
+    num_shards : 1,
+    zone_name : "ZONE 2 managed by terraform",
+    region_name : "US_EAST_2",
+    electable_nodes : 3,
+    priority : 7,
+    read_only_nodes : 0
+  }]
+
+
   # app specific variables
   name                              = "test"
   dns_name                          = "${local.git}.${data.aws_route53_zone.this.name}"
