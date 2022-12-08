@@ -284,3 +284,9 @@ variable "stickiness" {
   type        = list(map(any))
   default     = null
 }
+
+variable "source_ips" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#source_ip"
+  type        = list(any)
+  default     = null
+}
