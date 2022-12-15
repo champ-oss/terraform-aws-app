@@ -290,3 +290,9 @@ variable "source_ips" {
   type        = list(any)
   default     = null
 }
+
+variable "enabled_health_check" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/3.71.0/docs/resources/lb_target_group#enabled"
+  type        = bool
+  default     = true
+}
