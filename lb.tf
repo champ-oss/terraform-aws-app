@@ -7,6 +7,7 @@ resource "aws_lb_target_group" "this" {
   deregistration_delay = var.deregistration_delay
 
   health_check {
+    count               = var.enabled_health_check != false ? 1 : 0
     enabled             = var.enabled_health_check
     path                = var.healthcheck
     matcher             = var.matcher
