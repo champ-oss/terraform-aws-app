@@ -145,6 +145,7 @@ module "this" {
   deregistration_delay              = 5
   retention_in_days                 = 3
   enable_execute_command            = true
+  enabled_health_check              = false
 
 
   environment = {

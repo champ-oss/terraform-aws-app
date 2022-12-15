@@ -7,14 +7,13 @@ resource "aws_lb_target_group" "this" {
   deregistration_delay = var.deregistration_delay
 
   health_check {
-    count               = var.enabled_health_check != false ? 1 : 0
     enabled             = var.enabled_health_check
-    path                = var.healthcheck
-    matcher             = var.matcher
-    healthy_threshold   = var.healthy_threshold
-    unhealthy_threshold = var.unhealthy_threshold
-    interval            = var.interval
-    timeout             = var.timeout
+    path                = var.enabled_health_check != false ? var.healthcheck_path : null
+    matcher             = var.enabled_health_check != false ? var.matcher : null
+    healthy_threshold   = var.enabled_health_check != false ? var.healthy_threshold : null
+    unhealthy_threshold = var.enabled_health_check != false ? var.unhealthy_threshold : null
+    interval            = var.enabled_health_check != false ? var.interval : null
+    timeout             = var.enabled_health_check != false ? var.timeout : null
   }
 
   dynamic "stickiness" {
