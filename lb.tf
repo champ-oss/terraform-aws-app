@@ -8,7 +8,7 @@ resource "aws_lb_target_group" "this" {
 
   health_check {
     enabled             = var.enabled_health_check
-    path                = var.enabled_health_check != false ? var.healthcheck_path : null
+    path                = var.enabled_health_check != false ? var.healthcheck : null
     matcher             = var.enabled_health_check != false ? var.matcher : null
     healthy_threshold   = var.enabled_health_check != false ? var.healthy_threshold : null
     unhealthy_threshold = var.enabled_health_check != false ? var.unhealthy_threshold : null

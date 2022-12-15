@@ -26,7 +26,7 @@ variable "cluster" {
   type        = string
 }
 
-variable "healthcheck_path" {
+variable "healthcheck" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group#path"
   type        = string
   default     = "/"
