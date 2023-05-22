@@ -19,3 +19,18 @@ resource "aws_ssm_parameter" "this" {
   tags        = merge(local.tags, var.tags)
 }
 
+resource "aws_ssm_parameter" "dns" {
+  count       = var.enable_route53 ? 1 : 0
+  name        = "/${var.git}/dns/${aws_route53_record.this.name}"
+  description = "gathering dns data"
+  type        = "SecureString"
+  value       = var.dns_name
+  tags = merge({
+    dns_endpoint = aws_route53_record.this.name
+  }, local.tags, var.tags)
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
