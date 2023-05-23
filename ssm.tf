@@ -22,9 +22,9 @@ resource "aws_ssm_parameter" "this" {
 resource "aws_ssm_parameter" "dns" {
   count       = var.enable_route53 ? 1 : 0
   name        = "/${var.git}/dns/${aws_route53_record.this[0].name}"
-  description = "gathering dns data"
+  description = "gathering route53 info"
   type        = "SecureString"
-  value       = var.dns_name
+  value       = aws_route53_record.this[0].name
   tags = merge({
     dns_endpoint = aws_route53_record.this[0].name
   }, local.tags, var.tags)
