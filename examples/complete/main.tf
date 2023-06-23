@@ -58,7 +58,7 @@ resource "random_string" "this" {
 }
 
 module "acm" {
-  source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.111-28fcc7c"
+  source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.113-5d72ba8"
   git               = local.git
   domain_name       = "${local.git}.${data.aws_route53_zone.this.name}"
   create_wildcard   = false
