@@ -27,6 +27,7 @@ resource "aws_ssm_parameter" "dns" {
   value       = aws_route53_record.this[0].name
   tags = merge({
     dns_endpoint = aws_route53_record.this[0].name
+    dns_path     = try(aws_lb_target_group.this.health_check[0].path, "")
   }, local.tags, var.tags)
 
   lifecycle {
