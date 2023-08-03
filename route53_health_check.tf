@@ -1,6 +1,14 @@
+provider "aws" {
+  alias  = "virginia"
+  region = "us-east-1"
+}
+
 module "route53_health_check" {
-  count         = var.enable_route53_health_check ? 1 : 0
-  source        = "github.com/champ-oss/terraform-aws-route53-health-check.git?ref=v1.0.2-9eb134a"
+  count  = var.enable_route53_health_check ? 1 : 0
+  source = "github.com/champ-oss/terraform-aws-route53-health-check.git?ref=v1.0.3-4e3cf4c"
+  providers = {
+    aws = aws.virginia
+  }
   git           = var.git
   type          = var.health_check_type
   port          = var.health_check_port
