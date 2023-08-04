@@ -297,7 +297,7 @@ variable "enable_route53_health_check" {
   default     = false
 }
 
-variable "health_check_alarms_email" {
+variable "health_check_webhook_url" {
   description = "https://registry.terraform.io/providers/-/aws/latest/docs/resources/sns_topic_subscription#endpoint"
   type        = string
   default     = null
