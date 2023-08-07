@@ -8,6 +8,6 @@ locals {
     component = var.name
   }
   name_tag = {
-    name = enable_route53_health_check != false ? aws_route53_record.this[0].name : null
+    name = var.enable_route53_health_check != false ? aws_route53_record.this[0].name : null
   }
 }
