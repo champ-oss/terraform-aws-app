@@ -290,3 +290,27 @@ variable "source_ips" {
   type        = list(any)
   default     = null
 }
+
+variable "enable_route53_health_check" {
+  description = "Create Route 53 health check"
+  type        = bool
+  default     = false
+}
+
+variable "health_check_type" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_health_check#type"
+  type        = string
+  default     = "HTTPS"
+}
+
+variable "health_check_port" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_health_check#port"
+  type        = number
+  default     = 443
+}
+
+variable "overwrite_ssm" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter.html#overwrite"
+  type        = bool
+  default     = true
+}
