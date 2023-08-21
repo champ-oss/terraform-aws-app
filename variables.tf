@@ -308,3 +308,9 @@ variable "health_check_port" {
   type        = number
   default     = 443
 }
+
+variable "overwrite_ssm" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter.html#overwrite"
+  type        = bool
+  default     = true
+}
