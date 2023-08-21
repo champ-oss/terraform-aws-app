@@ -16,6 +16,7 @@ resource "aws_ssm_parameter" "this" {
   name        = "${local.ssm_prefix}${each.key}"
   type        = "SecureString"
   value       = each.value.plaintext[each.key]
+  overwrite   = var.overwrite_ssm
   tags        = merge(local.tags, var.tags)
 }
 
@@ -25,6 +26,7 @@ resource "aws_ssm_parameter" "dns" {
   description = "gathering route53 info"
   type        = "SecureString"
   value       = aws_route53_record.this[0].name
+  overwrite   = var.overwrite_ssm
   tags = merge({
     dns_endpoint = aws_route53_record.this[0].name
     dns_path     = try(aws_lb_target_group.this.health_check[0].path, "")
