@@ -4,7 +4,7 @@ provider "aws" {
 }
 
 module "route53_health_check" {
-  count  = var.enable_route53_health_check && (var.desired_count != 0 || var.min_capacity != 0) ? 1 : 0
+  count  = var.desired_count != 0 || var.min_capacity != 0 ? 1 : 0
   source = "github.com/champ-oss/terraform-aws-route53-health-check.git?ref=v1.0.6-ee66457"
   providers = {
     aws = aws.virginia
