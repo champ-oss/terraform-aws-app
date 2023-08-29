@@ -144,7 +144,8 @@ module "this" {
   health_check_grace_period_seconds = 5
   deregistration_delay              = 5
   retention_in_days                 = 3
-  desired_count                     = 1
+  min_capacity                      = 1
+  max_capacity                      = 2
   enable_execute_command            = true
 
   environment = {
@@ -183,6 +184,6 @@ module "autoscale" {
   memory               = 512
   scale_in_cooldown    = 30
   scale_out_cooldown   = 30
-  min_capacity         = 0
-  max_capacity         = 0
+  min_capacity         = 1
+  max_capacity         = 10
 }
