@@ -144,6 +144,7 @@ module "this" {
   health_check_grace_period_seconds = 5
   deregistration_delay              = 5
   retention_in_days                 = 3
+  desired_count                     = 0
   enable_execute_command            = true
 
   environment = {
