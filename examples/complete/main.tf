@@ -125,6 +125,7 @@ module "this" {
   lb_dns_name        = module.core.lb_public_dns_name
   lb_zone_id         = module.core.lb_public_zone_id
   enable_route53     = true
+  enable_route53_health_check = true
 
   #
   /* stickiness example
