@@ -182,6 +182,6 @@ module "autoscale" {
   memory               = 512
   scale_in_cooldown    = 30
   scale_out_cooldown   = 30
-  min_capacity         = 1
+  min_capacity         = 0
   max_capacity         = 10
 }
