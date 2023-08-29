@@ -291,6 +291,12 @@ variable "source_ips" {
   default     = null
 }
 
+variable "enable_route53_health_check" {
+  description = "Create Route 53 health check"
+  type        = bool
+  default     = false
+}
+
 variable "health_check_type" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_health_check#type"
   type        = string
