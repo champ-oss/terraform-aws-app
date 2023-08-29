@@ -145,7 +145,8 @@ module "this" {
   health_check_grace_period_seconds = 5
   deregistration_delay              = 5
   retention_in_days                 = 3
-  desired_count                     = 1
+  min_capacity                      = 0
+  max_capacity                      = 0
   enable_execute_command            = true
 
   environment = {
@@ -168,22 +169,23 @@ module "this" {
 }
 
 module "autoscale" {
-  source               = "../../"
-  git                  = local.git
-  vpc_id               = data.aws_vpcs.this.ids[0]
-  subnets              = data.aws_subnets.private.ids
-  zone_id              = data.aws_route53_zone.this.zone_id
-  cluster              = module.core.ecs_cluster_name
-  security_groups      = [module.core.ecs_app_security_group]
-  execution_role_arn   = module.core.execution_ecs_role_arn
-  enable_load_balancer = false
-  enable_route53       = false
-  name                 = "autoscale"
-  image                = "danielsantos/cpustress"
-  cpu                  = 256
-  memory               = 512
-  scale_in_cooldown    = 30
-  scale_out_cooldown   = 30
-  min_capacity         = 1
-  max_capacity         = 10
+  source                      = "../../"
+  git                         = local.git
+  vpc_id                      = data.aws_vpcs.this.ids[0]
+  subnets                     = data.aws_subnets.private.ids
+  zone_id                     = data.aws_route53_zone.this.zone_id
+  cluster                     = module.core.ecs_cluster_name
+  security_groups             = [module.core.ecs_app_security_group]
+  execution_role_arn          = module.core.execution_ecs_role_arn
+  enable_load_balancer        = false
+  enable_route53              = false
+  name                        = "autoscale"
+  image                       = "danielsantos/cpustress"
+  cpu                         = 256
+  memory                      = 512
+  scale_in_cooldown           = 30
+  scale_out_cooldown          = 30
+  min_capacity                = 0
+  max_capacity                = 10
+  enable_route53_health_check = true
 }
