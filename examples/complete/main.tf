@@ -183,5 +183,5 @@ module "autoscale" {
   scale_in_cooldown    = 30
   scale_out_cooldown   = 30
   min_capacity         = 0
-  max_capacity         = 10
+  max_capacity         = 0
 }
