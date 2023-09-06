@@ -172,3 +172,7 @@ output "aws_ssm_parameter_names" {
   description = "List of SSM parameter names"
   value       = module.this.aws_ssm_parameter_names
 }
+
+output "ssm_kms_test_1" {
+  value = [for param in module.this.aws_ssm_parameter_names : param if endswith(param, "KMSTEST1")]
+}
