@@ -162,3 +162,13 @@ output "task_definition_arn" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_task_definition#arn"
   value       = module.this.task_definition_arn
 }
+
+output "dns_name" {
+  description = "DNS host for ECS app"
+  value       = "${local.git}.${data.aws_route53_zone.this.name}"
+}
+
+output "aws_ssm_parameter_names" {
+  description = "List of SSM parameter names"
+  value       = module.this.aws_ssm_parameter_names
+}

@@ -12,3 +12,8 @@ output "target_group_arn" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group#arn"
   value       = aws_lb_target_group.this.arn
 }
+
+output "aws_ssm_parameter_names" {
+  description = "List of SSM parameter names"
+  value       = [for param in aws_ssm_parameter.this : param.name]
+}
