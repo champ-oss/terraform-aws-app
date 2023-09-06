@@ -1,9 +1,5 @@
-terraform {
-  backend "s3" {}
-}
-
 locals {
-  git = "terraform-aws-app"
+  git = "terraform-aws-app-${random_id.this.hex}"
   tags = {
     git     = local.git
     cost    = "shared"
@@ -49,12 +45,8 @@ data "aws_route53_zone" "this" {
   name = "oss.champtest.net."
 }
 
-resource "random_string" "this" {
-  length  = 5
-  special = false
-  upper   = false
-  lower   = true
-  number  = true
+resource "random_id" "this" {
+  byte_length = 2
 }
 
 module "acm" {
@@ -83,7 +75,7 @@ module "core" {
 module "kms" {
   source                  = "github.com/champ-oss/terraform-aws-kms.git?ref=v1.0.31-3fc28eb"
   git                     = local.git
-  name                    = "alias/${local.git}-${random_string.this.result}"
+  name                    = "alias/${local.git}-${random_id.this.hex}"
   deletion_window_in_days = 7
   account_actions         = []
 }
@@ -99,14 +91,14 @@ resource "aws_kms_ciphertext" "secret2" {
 }
 
 resource "aws_ssm_parameter" "secret1" {
-  name  = "${local.git}-${random_string.this.result}-1"
+  name  = "${local.git}-${random_id.this.hex}-1"
   type  = "SecureString"
   value = "ssm secret 1"
   tags  = local.tags
 }
 
 resource "aws_ssm_parameter" "secret2" {
-  name  = "${local.git}-${random_string.this.result}-2"
+  name  = "${local.git}-${random_id.this.hex}-2"
   type  = "SecureString"
   value = "ssm secret 2"
   tags  = local.tags
@@ -166,23 +158,7 @@ module "this" {
   }
 }
 
-module "autoscale" {
-  source               = "../../"
-  git                  = local.git
-  vpc_id               = data.aws_vpcs.this.ids[0]
-  subnets              = data.aws_subnets.private.ids
-  zone_id              = data.aws_route53_zone.this.zone_id
-  cluster              = module.core.ecs_cluster_name
-  security_groups      = [module.core.ecs_app_security_group]
-  execution_role_arn   = module.core.execution_ecs_role_arn
-  enable_load_balancer = false
-  enable_route53       = false
-  name                 = "autoscale"
-  image                = "danielsantos/cpustress"
-  cpu                  = 256
-  memory               = 512
-  scale_in_cooldown    = 30
-  scale_out_cooldown   = 30
-  min_capacity         = 1
-  max_capacity         = 10
+output "task_definition_arn" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_task_definition#arn"
+  value       = module.this.task_definition_arn
 }
