@@ -85,6 +85,12 @@ variable "enable_execute_command" {
   default     = false
 }
 
+variable "enable_public_healthcheck" {
+  description = "Expose the healthcheck path publicly, without whitelisting."
+  type        = bool
+  default     = false
+}
+
 variable "zone_id" {
   description = "https://www.terraform.io/docs/providers/aws/r/route53_record.html#zone_id"
   type        = string
