@@ -81,11 +81,11 @@ resource "aws_lb_listener_rule" "public_healthcheck" {
     }
   }
 
-  #  condition {
-  #    query_string {
-  #      key   = "health"
-  #      value = "check"
-  #    }
-  #  }
+  condition {
+    query_string {
+      key   = "secret"
+      value = random_password.healthcheck.result
+    }
+  }
 }
 
