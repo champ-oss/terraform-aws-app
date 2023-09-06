@@ -17,3 +17,9 @@ output "aws_ssm_parameter_names" {
   description = "List of SSM parameter names"
   value       = [for param in aws_ssm_parameter.this : param.name]
 }
+
+output "route53_health_check_resource_path" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_health_check#resource_path"
+  sensitive   = true
+  value       = var.enable_route53_health_check ? "${aws_lb_target_group.this.health_check[0].path}?secret=${random_password.healthcheck[0].result}" : null
+}

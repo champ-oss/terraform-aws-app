@@ -94,7 +94,6 @@ module "this" {
   lb_zone_id                        = module.core.lb_public_zone_id
   enable_route53                    = true
   enable_route53_health_check       = true
-  enable_public_healthcheck         = true
   name                              = "test"
   dns_name                          = "${local.git}.${data.aws_route53_zone.this.name}"
   image                             = "testcontainers/helloworld"
@@ -112,4 +111,10 @@ module "this" {
 output "dns_name" {
   description = "DNS host for ECS app"
   value       = "${local.git}.${data.aws_route53_zone.this.name}"
+}
+
+output "route53_health_check_resource_path" {
+  description = "Path for healthcheck including secret"
+  sensitive   = true
+  value       = module.this.route53_health_check_resource_path
 }

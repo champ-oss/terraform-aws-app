@@ -13,6 +13,7 @@ locals {
 }
 
 resource "random_password" "healthcheck" {
+  count   = var.enable_route53_health_check ? 1 : 0
   length  = 32
   special = false
 }
