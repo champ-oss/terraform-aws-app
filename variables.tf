@@ -314,3 +314,9 @@ variable "overwrite_ssm" {
   type        = bool
   default     = true
 }
+
+variable "healthcheck_query_parameter" {
+  description = "URL query parameter name needed to call the healthcheck"
+  type        = string
+  default     = "secret"
+}

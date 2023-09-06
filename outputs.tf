@@ -21,5 +21,5 @@ output "aws_ssm_parameter_names" {
 output "route53_health_check_resource_path" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_health_check#resource_path"
   sensitive   = true
-  value       = var.enable_route53_health_check ? "${aws_lb_target_group.this.health_check[0].path}?secret=${random_password.healthcheck[0].result}" : null
+  value       = var.enable_route53_health_check ? "${aws_lb_target_group.this.health_check[0].path}?${var.healthcheck_query_parameter}=${random_password.healthcheck[0].result}" : null
 }

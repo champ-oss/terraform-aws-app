@@ -83,7 +83,7 @@ resource "aws_lb_listener_rule" "public_healthcheck" {
 
   condition {
     query_string {
-      key   = "secret"
+      key   = var.healthcheck_query_parameter
       value = random_password.healthcheck[0].result
     }
   }
