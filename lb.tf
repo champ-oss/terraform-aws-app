@@ -31,8 +31,8 @@ resource "aws_lb_target_group" "this" {
 }
 
 locals {
-  # Split the list of source IPs into smaller lists of 5 items each (5 is max allowed per source_ip condition)
-  ip_groups = chunklist(var.source_ips, 5)
+  # Split the list of source IPs into smaller lists of 4 items each (max of 5 condition values per rule, including host-header)
+  ip_groups = chunklist(var.source_ips, 4)
 }
 
 resource "aws_lb_listener_rule" "this" {
