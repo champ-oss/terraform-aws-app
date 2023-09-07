@@ -105,7 +105,12 @@ module "this" {
   retention_in_days                 = 3
   enable_execute_command            = true
   source_ips = [
-    "1.1.1.1/32"
+    "1.1.1.1/32",
+    "1.1.1.2/32",
+    "1.1.1.3/32",
+    "1.1.1.4/32",
+    "1.1.1.5/32",
+    "1.1.1.6/32"
   ]
 }
 

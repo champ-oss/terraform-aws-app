@@ -30,8 +30,12 @@ resource "aws_lb_target_group" "this" {
   }
 }
 
+locals {
+  rules_needed = length(var.source_ips) > 5 ? ceil(length(var.source_ips) / 5) : 1
+}
+
 resource "aws_lb_listener_rule" "this" {
-  count        = var.enable_load_balancer ? 1 : 0
+  count        = var.enable_load_balancer ? local.rules_needed : 0
   depends_on   = [aws_lb_target_group.this]
   listener_arn = var.listener_arn
   tags         = merge(local.tags, var.tags)
@@ -52,7 +56,11 @@ resource "aws_lb_listener_rule" "this" {
 
     content {
       source_ip {
-        values = var.source_ips
+        values = slice(
+          var.source_ips,
+          count.index * 5,
+          ((count.index * 5) + 5) > length(var.source_ips) ? length(var.source_ips) : (count.index * 5) + 5
+        )
       }
     }
   }
