@@ -297,6 +297,12 @@ variable "enable_route53_health_check" {
   default     = false
 }
 
+variable "enable_public_healthcheck_rule" {
+  description = "Create a rule on the load balancer to allow public healthcheck requests using a secret token"
+  type        = bool
+  default     = false
+}
+
 variable "health_check_type" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_health_check#type"
   type        = string
@@ -313,4 +319,10 @@ variable "overwrite_ssm" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter.html#overwrite"
   type        = bool
   default     = true
+}
+
+variable "healthcheck_query_parameter" {
+  description = "URL query parameter name needed to call the healthcheck"
+  type        = string
+  default     = "secret"
 }

@@ -57,3 +57,35 @@ resource "aws_lb_listener_rule" "this" {
     }
   }
 }
+
+resource "aws_lb_listener_rule" "public_healthcheck" {
+  count        = var.enable_load_balancer && var.enable_public_healthcheck_rule ? 1 : 0
+  depends_on   = [aws_lb_target_group.this]
+  listener_arn = var.listener_arn
+  tags         = merge(local.tags, var.tags)
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.this.arn
+  }
+
+  condition {
+    host_header {
+      values = [var.dns_name]
+    }
+  }
+
+  condition {
+    path_pattern {
+      values = [var.healthcheck]
+    }
+  }
+
+  condition {
+    query_string {
+      key   = var.healthcheck_query_parameter
+      value = random_password.healthcheck[0].result
+    }
+  }
+}
+

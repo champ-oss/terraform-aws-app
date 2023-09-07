@@ -80,55 +80,21 @@ module "kms" {
   account_actions         = []
 }
 
-resource "aws_kms_ciphertext" "secret1" {
-  key_id    = module.kms.key_id
-  plaintext = "kms secret 1"
-}
-
-resource "aws_kms_ciphertext" "secret2" {
-  key_id    = module.kms.key_id
-  plaintext = "kms secret 2"
-}
-
-resource "aws_ssm_parameter" "secret1" {
-  name  = "${local.git}-${random_id.this.hex}-1"
-  type  = "SecureString"
-  value = "ssm secret 1"
-  tags  = local.tags
-}
-
-resource "aws_ssm_parameter" "secret2" {
-  name  = "${local.git}-${random_id.this.hex}-2"
-  type  = "SecureString"
-  value = "ssm secret 2"
-  tags  = local.tags
-}
-
 module "this" {
-  source                      = "../../"
-  git                         = local.git
-  vpc_id                      = data.aws_vpcs.this.ids[0]
-  subnets                     = data.aws_subnets.private.ids
-  zone_id                     = data.aws_route53_zone.this.zone_id
-  cluster                     = module.core.ecs_cluster_name
-  security_groups             = [module.core.ecs_app_security_group]
-  execution_role_arn          = module.core.execution_ecs_role_arn
-  listener_arn                = module.core.lb_public_listener_arn
-  lb_dns_name                 = module.core.lb_public_dns_name
-  lb_zone_id                  = module.core.lb_public_zone_id
-  enable_route53              = true
-  enable_route53_health_check = true
-
-  #
-  /* stickiness example
-  stickiness = [{
-    enabled : true,
-    type : "lb_cookie"
-    cookie_duration : 43200,
-  }]
-  */
-
-  # app specific variables
+  source                            = "../../"
+  git                               = local.git
+  vpc_id                            = data.aws_vpcs.this.ids[0]
+  subnets                           = data.aws_subnets.private.ids
+  zone_id                           = data.aws_route53_zone.this.zone_id
+  cluster                           = module.core.ecs_cluster_name
+  security_groups                   = [module.core.ecs_app_security_group]
+  execution_role_arn                = module.core.execution_ecs_role_arn
+  listener_arn                      = module.core.lb_public_listener_arn
+  lb_dns_name                       = module.core.lb_public_dns_name
+  lb_zone_id                        = module.core.lb_public_zone_id
+  enable_route53                    = true
+  enable_route53_health_check       = true
+  enable_public_healthcheck_rule    = true
   name                              = "test"
   dns_name                          = "${local.git}.${data.aws_route53_zone.this.name}"
   image                             = "testcontainers/helloworld"
@@ -138,24 +104,9 @@ module "this" {
   deregistration_delay              = 5
   retention_in_days                 = 3
   enable_execute_command            = true
-
-  environment = {
-    this  = "that"
-    these = "those"
-  }
-
-  secrets = {
-    SSMTEST1 = aws_ssm_parameter.secret1.name
-    SSMTEST2 = aws_ssm_parameter.secret2.name
-  }
-
-  kms_secrets = {
-    KMSTEST1 = aws_kms_ciphertext.secret1.ciphertext_blob
-    KMSTEST2 = aws_kms_ciphertext.secret2.ciphertext_blob
-
-    # Test overriding a ssm "secret" with a "kms_secret"
-    SSMTEST2 = aws_kms_ciphertext.secret2.ciphertext_blob
-  }
+  source_ips = [
+    "1.1.1.1/32"
+  ]
 }
 
 output "dns_name" {
@@ -163,17 +114,8 @@ output "dns_name" {
   value       = "${local.git}.${data.aws_route53_zone.this.name}"
 }
 
-output "ssm_kms_test_1" {
-  description = "SSM parameter name"
-  value       = [for param in module.this.aws_ssm_parameter_names : param if endswith(param, "KMSTEST1")]
-}
-
-output "ssm_kms_test_2" {
-  description = "SSM parameter name"
-  value       = [for param in module.this.aws_ssm_parameter_names : param if endswith(param, "KMSTEST2")]
-}
-
-output "ssm_ssm_test_1" {
-  description = "SSM parameter name"
-  value       = [for param in module.this.aws_ssm_parameter_names : param if endswith(param, "SSMTEST2")]
+output "route53_health_check_resource_path" {
+  description = "Path for healthcheck including secret"
+  sensitive   = true
+  value       = module.this.route53_health_check_resource_path
 }
