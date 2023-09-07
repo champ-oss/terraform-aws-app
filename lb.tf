@@ -59,7 +59,7 @@ resource "aws_lb_listener_rule" "this" {
         values = slice(
           var.source_ips,
           count.index * 5,
-          ((count.index * 5) + 4) > length(var.source_ips) ? length(var.source_ips) : (count.index * 5) + 4
+          (count.index * 5) + 5
         )
       }
     }
