@@ -31,6 +31,7 @@ resource "aws_lb_target_group" "this" {
 }
 
 locals {
+  # Split the list of source IPs into smaller lists of 5 items each (5 is max allowed per source_ip condition)
   ip_groups = chunklist(var.source_ips, 5)
 }
 
