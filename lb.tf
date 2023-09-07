@@ -52,7 +52,7 @@ resource "aws_lb_listener_rule" "this" {
   }
 
   dynamic "condition" {
-    for_each = var.source_ips != null ? [1] : []
+    for_each = length(var.source_ips) > 0 ? [1] : []
 
     content {
       source_ip {
