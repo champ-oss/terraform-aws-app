@@ -105,7 +105,6 @@ resource "aws_ssm_parameter" "secret2" {
 }
 
 module "this" {
-  depends_on                  = [module.core]
   source                      = "../../"
   git                         = local.git
   vpc_id                      = data.aws_vpcs.this.ids[0]
