@@ -70,6 +70,24 @@ resource "aws_lb_listener_rule" "this" {
     }
   }
 
+  dynamic "action" {
+    for_each = var.enable_authenticate_cognito ? [1] : []
+    content {
+      type = "authenticate-cognito"
+
+      authenticate_cognito {
+        authentication_request_extra_params = var.cognito_authentication_request_extra_params
+        on_unauthenticated_request          = var.cognito_on_unauthenticated_request
+        scope                               = var.cognito_scope
+        session_cookie_name                 = var.cognito_session_cookie_name
+        session_timeout                     = var.cognito_session_timeout
+        user_pool_arn                       = var.cognito_user_pool_arn
+        user_pool_client_id                 = var.cognito_user_pool_client_id
+        user_pool_domain                    = var.cognito_user_pool_domain
+      }
+    }
+  }
+
   condition {
     host_header {
       values = [var.dns_name]
