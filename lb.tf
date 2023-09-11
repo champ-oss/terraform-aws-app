@@ -44,11 +44,6 @@ resource "aws_lb_listener_rule" "this" {
   listener_arn = var.listener_arn
   tags         = merge(local.tags, var.tags)
 
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.this.arn
-  }
-
   dynamic "action" {
     for_each = var.enable_authenticate_oidc ? [1] : []
     content {
@@ -86,6 +81,11 @@ resource "aws_lb_listener_rule" "this" {
         user_pool_domain                    = var.cognito_user_pool_domain
       }
     }
+  }
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.this.arn
   }
 
   condition {
