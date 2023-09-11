@@ -49,6 +49,27 @@ resource "aws_lb_listener_rule" "this" {
     target_group_arn = aws_lb_target_group.this.arn
   }
 
+  dynamic "action" {
+    for_each = var.enable_authenticate_oidc ? [1] : []
+    content {
+      type = "authenticate-oidc"
+
+      authenticate_oidc {
+        authentication_request_extra_params = var.oidc_authentication_request_extra_params
+        authorization_endpoint              = var.oidc_authorization_endpoint
+        client_id                           = var.oidc_client_id
+        client_secret                       = var.oidc_client_secret
+        issuer                              = var.oidc_issuer
+        on_unauthenticated_request          = var.oidc_on_unauthenticated_request
+        scope                               = var.oidc_scope
+        session_cookie_name                 = var.oidc_session_cookie_name
+        session_timeout                     = var.oidc_session_timeout
+        token_endpoint                      = var.oidc_token_endpoint
+        user_info_endpoint                  = var.oidc_user_info_endpoint
+      }
+    }
+  }
+
   condition {
     host_header {
       values = [var.dns_name]
