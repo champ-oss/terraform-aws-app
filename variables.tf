@@ -288,7 +288,7 @@ variable "stickiness" {
 variable "source_ips" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#source_ip"
   type        = list(any)
-  default     = null
+  default     = []
 }
 
 variable "enable_route53_health_check" {
