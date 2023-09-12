@@ -326,3 +326,129 @@ variable "healthcheck_query_parameter" {
   type        = string
   default     = "secret"
 }
+
+variable "enable_authenticate_oidc" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#authenticate_oidc"
+  type        = bool
+  default     = false
+}
+
+variable "oidc_authentication_request_extra_params" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#authentication_request_extra_params"
+  type        = map(string)
+  default     = null
+}
+
+variable "oidc_authorization_endpoint" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#authorization_endpoint"
+  type        = string
+  default     = null
+}
+
+variable "oidc_client_id" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#client_id"
+  type        = string
+  default     = null
+}
+
+variable "oidc_client_secret" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#client_secret"
+  type        = string
+  default     = null
+}
+
+variable "oidc_issuer" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#issuer"
+  type        = string
+  default     = null
+}
+
+variable "oidc_on_unauthenticated_request" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#on_unauthenticated_request"
+  type        = string
+  default     = null
+}
+
+variable "oidc_scope" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#scope"
+  type        = string
+  default     = null
+}
+
+variable "oidc_session_cookie_name" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#session_cookie_name"
+  type        = string
+  default     = null
+}
+
+variable "oidc_session_timeout" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#session_timeout"
+  type        = string
+  default     = null
+}
+
+variable "oidc_token_endpoint" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#token_endpoint"
+  type        = string
+  default     = null
+}
+
+variable "oidc_user_info_endpoint" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#user_info_endpoint"
+  type        = string
+  default     = null
+}
+
+variable "enable_authenticate_cognito" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#authenticate_cognito"
+  type        = bool
+  default     = false
+}
+
+variable "cognito_authentication_request_extra_params" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#authentication_request_extra_params"
+  type        = map(string)
+  default     = null
+}
+
+variable "cognito_on_unauthenticated_request" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#on_unauthenticated_request"
+  type        = string
+  default     = null
+}
+
+variable "cognito_scope" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#scope"
+  type        = string
+  default     = null
+}
+
+variable "cognito_session_cookie_name" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#session_cookie_name"
+  type        = string
+  default     = null
+}
+
+variable "cognito_session_timeout" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#session_timeout"
+  type        = string
+  default     = null
+}
+
+variable "cognito_user_pool_arn" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#user_pool_arn"
+  type        = string
+  default     = null
+}
+
+variable "cognito_user_pool_client_id" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#user_pool_client_id"
+  type        = string
+  default     = null
+}
+
+variable "cognito_user_pool_domain" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#user_pool_domain"
+  type        = string
+  default     = null
+}
