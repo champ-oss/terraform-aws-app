@@ -13,7 +13,7 @@ locals {
 
 module "route53_health_check" {
   count  = var.enable_route53_health_check && aws_appautoscaling_target.this.min_capacity != 0 ? 1 : 0
-  source = "github.com/champ-oss/terraform-aws-route53-health-check.git?ref=v1.0.6-ee66457"
+  source = "github.com/champ-oss/terraform-aws-route53-health-check.git?ref=d7ac6755f704bd28cc6cbd05ac4c92331081eeb7"
   providers = {
     aws = aws.virginia
   }

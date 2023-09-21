@@ -23,3 +23,8 @@ output "route53_health_check_resource_path" {
   sensitive   = true
   value       = var.enable_route53_health_check ? local.route53_health_check_resource_path : null
 }
+
+output "r53_health_check_id" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_health_check#id"
+  value       = var.enable_route53_health_check ? module.route53_health_check[0].r53_health_check_id : null
+}
