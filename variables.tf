@@ -452,3 +452,9 @@ variable "cognito_user_pool_domain" {
   type        = string
   default     = null
 }
+
+variable "path_pattern" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#path_pattern"
+  type        = list(string)
+  default     = []
+}

@@ -88,6 +88,15 @@ resource "aws_lb_listener_rule" "this" {
     target_group_arn = aws_lb_target_group.this.arn
   }
 
+  dynamic "condition" {
+    for_each = length(var.path_pattern) > 0 ? [true] : []
+    content {
+      path_pattern {
+        values = var.path_pattern
+      }
+    }
+  }
+
   condition {
     host_header {
       values = [var.dns_name]
