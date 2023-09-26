@@ -38,6 +38,27 @@ locals {
   rule_count = length(local.ip_groups) != 0 ? length(local.ip_groups) : 1
 }
 
+resource "aws_lb_listener_rule" "path_pattern" {
+  count        = var.enable_load_balancer && var.path_pattern != [] ? 1 : 0
+  depends_on   = [aws_lb_target_group.this]
+  listener_arn = var.listener_arn
+  tags         = merge(local.tags, var.tags)
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.this.arn
+  }
+
+  dynamic "condition" {
+    for_each = length(var.path_pattern) > 0 ? [true] : []
+    content {
+      path_pattern {
+        values = var.path_pattern
+      }
+    }
+  }
+}
+
 resource "aws_lb_listener_rule" "this" {
   count        = var.enable_load_balancer ? local.rule_count : 0
   depends_on   = [aws_lb_target_group.this]
@@ -86,15 +107,6 @@ resource "aws_lb_listener_rule" "this" {
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.this.arn
-  }
-
-  dynamic "condition" {
-    for_each = length(var.path_pattern) > 0 ? [true] : []
-    content {
-      path_pattern {
-        values = var.path_pattern
-      }
-    }
   }
 
   condition {
