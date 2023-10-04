@@ -14,7 +14,7 @@ provider "aws" {
 provider "aws" {
   # Needed for Route53 healthcheck
   region = "us-east-1"
-  alias  = "virginia"
+  alias  = "us-east-1"
 }
 
 data "aws_vpcs" "this" {
@@ -114,7 +114,7 @@ module "this" {
   source = "../../"
   providers = {
     # Needed for Route53 healthcheck
-    aws.virginia = aws.virginia
+    aws.us-east-1 = aws.us-east-1
   }
   git                         = local.git
   vpc_id                      = data.aws_vpcs.this.ids[0]
