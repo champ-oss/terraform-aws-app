@@ -114,7 +114,7 @@ module "this" {
   source = "../../"
   providers = {
     # Needed for Route53 healthcheck
-    aws = aws.virginia
+    aws.virginia = aws.virginia
   }
   git                         = local.git
   vpc_id                      = data.aws_vpcs.this.ids[0]
