@@ -11,6 +11,12 @@ provider "aws" {
   region = "us-east-2"
 }
 
+provider "aws" {
+  # Needed for Route53 healthcheck
+  region = "us-east-1"
+  alias  = "virginia"
+}
+
 data "aws_vpcs" "this" {
   tags = {
     purpose = "vega"
@@ -105,7 +111,11 @@ resource "aws_ssm_parameter" "secret2" {
 }
 
 module "this" {
-  source                      = "../../"
+  source = "../../"
+  providers = {
+    # Needed for Route53 healthcheck
+    aws = aws.virginia
+  }
   git                         = local.git
   vpc_id                      = data.aws_vpcs.this.ids[0]
   subnets                     = data.aws_subnets.private.ids

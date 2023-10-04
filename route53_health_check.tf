@@ -1,8 +1,3 @@
-provider "aws" {
-  alias  = "virginia"
-  region = "us-east-1"
-}
-
 locals {
   route53_health_check_resource_path = (
     var.enable_public_healthcheck_rule ?
