@@ -8,7 +8,7 @@ locals {
 
 module "route53_health_check" {
   count         = var.enable_route53_health_check && aws_appautoscaling_target.this.min_capacity != 0 ? 1 : 0
-  source        = "github.com/champ-oss/terraform-aws-route53-health-check.git?ref=v1.0.6-ee66457"
+  source        = "github.com/champ-oss/terraform-aws-route53-health-check.git?ref=v1.0.7-8ed040f"
   git           = var.git
   type          = var.health_check_type
   port          = var.health_check_port
