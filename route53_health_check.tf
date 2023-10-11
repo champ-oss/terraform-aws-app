@@ -13,7 +13,7 @@ locals {
 }
 
 module "route53_health_check" {
-  count         = var.enable_route53_health_check && aws_appautoscaling_target.this.min_capacity != 0 ? 1 : 0
+  count = var.enable_route53_health_check && aws_appautoscaling_target.this.min_capacity != 0 ? 1 : 0
   providers = {
     aws = aws.virginia
   }

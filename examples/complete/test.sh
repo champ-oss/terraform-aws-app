@@ -1,7 +1,5 @@
 set -e
 
-sleep 600
-
 # Validate the values of the KMS SSM parameters "KMSTEST1" and "KMSTEST2"
 aws ssm get-parameter --with-decryption --name $SSM_KMS_TEST_1 --query 'Parameter.Value' | grep "kms secret 1"
 aws ssm get-parameter --with-decryption --name $SSM_KMS_TEST_2 --query 'Parameter.Value' | grep "kms secret 2"
