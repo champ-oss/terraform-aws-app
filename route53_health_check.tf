@@ -1,3 +1,4 @@
+# temp add provider to delete sns
 provider "aws" {
   alias  = "virginia"
   region = "us-east-1"
