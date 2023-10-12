@@ -1,10 +1,3 @@
-# temp add provider to delete sns
-provider "aws" {
-  alias  = "virginia"
-  region = "us-east-1"
-}
-
-
 locals {
   route53_health_check_resource_path = (
     var.enable_public_healthcheck_rule ?
@@ -14,10 +7,7 @@ locals {
 }
 
 module "route53_health_check" {
-  count = var.enable_route53_health_check && aws_appautoscaling_target.this.min_capacity != 0 ? 1 : 0
-  providers = {
-    aws = aws.virginia
-  }
+  count         = var.enable_route53_health_check && aws_appautoscaling_target.this.min_capacity != 0 ? 1 : 0
   source        = "github.com/champ-oss/terraform-aws-route53-health-check.git?ref=v1.0.8-e059e1a"
   type          = var.health_check_type
   port          = var.health_check_port
