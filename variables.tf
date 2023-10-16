@@ -249,6 +249,18 @@ variable "scale_out_cooldown" {
   default     = 60
 }
 
+variable "autoscaling_predefined_metric_type" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy#predefined_metric_type"
+  type        = string
+  default     = "ECSServiceAverageCPUUtilization"
+}
+
+variable "autoscaling_policy_type" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy#policy_type"
+  type        = string
+  default     = "TargetTrackingScaling"
+}
+
 variable "deployment_maximum_percent" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service#deployment_maximum_percent"
   type        = number
