@@ -26,6 +26,5 @@ output "route53_health_check_resource_path" {
 
 output "dns_endpoint" {
   description = "output dns endpoint"
-  sensitive   = true
   value       = var.enable_route53 ? aws_route53_record.this[0].name : null
 }
