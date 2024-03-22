@@ -64,7 +64,7 @@ resource "random_id" "this" {
 }
 
 module "acm" {
-  source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.115-bfc08dd"
+  source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.116-cd36b2b"
   git               = local.git
   domain_name       = "${local.git}.${data.aws_route53_zone.this.name}"
   create_wildcard   = false
@@ -73,7 +73,7 @@ module "acm" {
 }
 
 module "core" {
-  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.115-ad9b0c1"
+  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.117-1ea02a2"
   git                       = local.git
   name                      = local.git
   vpc_id                    = data.aws_vpcs.this.ids[0]
