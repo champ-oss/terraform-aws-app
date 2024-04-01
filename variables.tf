@@ -276,13 +276,13 @@ variable "deployment_minimum_healthy_percent" {
 variable "deployment_circuit_breaker_enable" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service#enable"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "deployment_circuit_breaker_rollback" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service#rollback"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "command" {
