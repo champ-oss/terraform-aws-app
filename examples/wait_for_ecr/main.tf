@@ -102,7 +102,7 @@ module "kms" {
 
 module "with_lb" {
   source                            = "../../"
-  git                               = local.git
+  git                               = "${local.git}a"
   vpc_id                            = data.aws_vpcs.this.ids[0]
   subnets                           = data.aws_subnets.private.ids
   zone_id                           = data.aws_route53_zone.this.zone_id
@@ -114,7 +114,7 @@ module "with_lb" {
   lb_zone_id                        = module.core.lb_public_zone_id
   enable_route53                    = true
   enable_wait_for_ecr               = true
-  name                              = "test"
+  name                              = "with_lb"
   dns_name                          = "${local.git}.${data.aws_route53_zone.this.name}"
   image                             = "912455136424.dkr.ecr.us-east-2.amazonaws.com/terraform-aws-app:${module.hash.hash}"
   healthcheck                       = "/ping"
@@ -125,7 +125,7 @@ module "with_lb" {
 
 module "without_lb" {
   source                            = "../../"
-  git                               = local.git
+  git                               = "${local.git}b"
   vpc_id                            = data.aws_vpcs.this.ids[0]
   subnets                           = data.aws_subnets.private.ids
   zone_id                           = data.aws_route53_zone.this.zone_id
@@ -136,7 +136,7 @@ module "without_lb" {
   enable_route53                    = false
   enable_route53_health_check       = false
   enable_wait_for_ecr               = true
-  name                              = "test"
+  name                              = "without_lb"
   image                             = "912455136424.dkr.ecr.us-east-2.amazonaws.com/terraform-aws-app:${module.hash.hash}"
   healthcheck                       = "/ping"
   port                              = 8080
