@@ -23,6 +23,6 @@ jobs:
       - name: ecr login
         run: aws ecr --region us-east-2 get-login-password | docker login --username AWS --password-stdin 912455136424.dkr.ecr.us-east-2.amazonaws.com
       - name: create ecr repo
-        run: aws ecr create-repository --region us-east-2 --repository-name terraform-aws-lambda || echo "repo already exists"
+        run: aws ecr create-repository --region us-east-2 --repository-name terraform-aws-app || echo "repo already exists"
       - name: docker push
         run: docker push ${REPO}:${GITHUB_SHA}
