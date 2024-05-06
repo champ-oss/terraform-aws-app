@@ -464,3 +464,9 @@ variable "cognito_user_pool_domain" {
   type        = string
   default     = null
 }
+
+variable "enable_wait_for_ecr" {
+  description = "Wait for the ECR image tag to become available"
+  type        = bool
+  default     = false
+}

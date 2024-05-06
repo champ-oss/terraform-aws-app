@@ -54,7 +54,7 @@ resource "aws_ecs_service" "this" {
   launch_type                        = "FARGATE"
   propagate_tags                     = "SERVICE"
   health_check_grace_period_seconds  = var.health_check_grace_period_seconds
-  depends_on                         = [aws_lb_listener_rule.this, aws_lb_listener_rule.public_healthcheck]
+  depends_on                         = [aws_lb_listener_rule.this, aws_lb_listener_rule.public_healthcheck, null_resource.wait_for_ecr]
   wait_for_steady_state              = var.wait_for_steady_state
   tags                               = merge(local.tags, var.tags)
   enable_execute_command             = var.enable_execute_command
@@ -83,6 +83,7 @@ resource "aws_ecs_service" "this" {
 }
 
 resource "aws_ecs_service" "disabled_load_balancer" {
+  depends_on                         = [null_resource.wait_for_ecr]
   count                              = var.enable_load_balancer ? 0 : 1
   name                               = var.name
   cluster                            = var.cluster
