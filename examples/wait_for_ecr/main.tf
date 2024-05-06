@@ -63,6 +63,12 @@ resource "random_id" "this" {
   byte_length = 2
 }
 
+module "hash" {
+  source   = "github.com/champ-oss/terraform-git-hash.git?ref=v1.0.12-fc3bb87"
+  path     = "${path.module}/../.."
+  fallback = ""
+}
+
 module "acm" {
   source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.114-1c756c3"
   git               = local.git
@@ -110,7 +116,7 @@ module "with_lb" {
   enable_wait_for_ecr               = true
   name                              = "test"
   dns_name                          = "${local.git}.${data.aws_route53_zone.this.name}"
-  image                             = "testcontainers/helloworld"
+  image                             = "912455136424.dkr.ecr.us-east-2.amazonaws.com/terraform-aws-app:${module.hash.hash}"
   healthcheck                       = "/ping"
   port                              = 8080
   health_check_grace_period_seconds = 5
@@ -131,7 +137,7 @@ module "without_lb" {
   enable_route53_health_check       = false
   enable_wait_for_ecr               = true
   name                              = "test"
-  image                             = "testcontainers/helloworld"
+  image                             = "912455136424.dkr.ecr.us-east-2.amazonaws.com/terraform-aws-app:${module.hash.hash}"
   healthcheck                       = "/ping"
   port                              = 8080
   health_check_grace_period_seconds = 5
