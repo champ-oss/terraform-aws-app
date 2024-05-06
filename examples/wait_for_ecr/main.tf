@@ -127,6 +127,8 @@ module "without_lb" {
   security_groups                   = [module.core.ecs_app_security_group]
   execution_role_arn                = module.core.execution_ecs_role_arn
   enable_load_balancer              = false
+  enable_route53                    = false
+  enable_route53_health_check       = false
   enable_wait_for_ecr               = true
   name                              = "test"
   image                             = "testcontainers/helloworld"
