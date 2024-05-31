@@ -94,8 +94,8 @@ module "autoscale" {
   cluster                                   = module.core.ecs_cluster_name
   security_groups                           = [module.core.ecs_app_security_group]
   execution_role_arn                        = module.core.execution_ecs_role_arn
-  enable_ecs_request_count_target_autoscale = true
-  load_balancer_arn_suffix                  = module.core.lb_private_arn_suffix
+  autoscaling_predefined_metric_type        = "ALBRequestCountPerTarget"
+  alb_arn_suffix                            = module.core.lb_private_arn_suffix
   enable_load_balancer                      = false
   enable_route53                            = false
   name                                      = "autoscale"

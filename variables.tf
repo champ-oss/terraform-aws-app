@@ -231,7 +231,7 @@ variable "min_capacity" {
   default     = 1
 }
 
-variable "autoscaling_target_cpu" {
+variable "autoscaling_target_value" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy#target_value"
   type        = number
   default     = 75
@@ -471,20 +471,14 @@ variable "enable_wait_for_ecr" {
   default     = false
 }
 
-variable "enable_ecs_request_count_target_autoscale" {
-  description = "Enable autoscaling based on ECS request target count on alb"
-  type        = bool
-  default     = false
+variable "alb_scaling_target_resource_id" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_target#resource_id"
+  type        = string
+  default     = ""
 }
 
-variable "ecs_request_count_autoscale_target_value" {
-  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy#target_value"
-  type        = number
-  default     = 100
-}
-
-variable "load_balancer_arn_suffix" {
-  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#load_balancer_arn_suffix"
+variable "alb_arn_suffix" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_target#resource_id"
   type        = string
   default     = ""
 }
