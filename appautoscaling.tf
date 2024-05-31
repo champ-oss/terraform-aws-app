@@ -25,3 +25,23 @@ resource "aws_appautoscaling_policy" "this" {
     scale_out_cooldown = var.scale_out_cooldown
   }
 }
+
+resource "aws_appautoscaling_policy" "request_count_per_target" {
+  count              = var.enable_ecs_request_count_target_autoscale ? 1 : 0
+  name               = "${var.git}-${var.name}-request-count-per-target"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.this.resource_id
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ALBRequestCountPerTarget"
+      resource_label         = aws_lb_target_group.this.arn
+    }
+
+    target_value       = var.ecs_request_count_autoscale_target_value
+    scale_in_cooldown  = var.ecs_request_count_autoscale_scale_in_cooldown
+    scale_out_cooldown = var.ecs_request_count_autoscale_scale_out_cooldown
+  }
+}

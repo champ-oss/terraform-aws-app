@@ -470,3 +470,27 @@ variable "enable_wait_for_ecr" {
   type        = bool
   default     = false
 }
+
+variable "enable_ecs_request_count_target_autoscale" {
+  description = "Enable autoscaling based on ECS request target count on alb"
+  type        = bool
+  default     = false
+}
+
+variable "ecs_request_count_autoscale_target_value" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy#target_value"
+  type        = number
+  default     = 100
+}
+
+variable "ecs_request_count_autoscale_scale_in_cooldown" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy#scale_in_cooldown"
+  type        = number
+  default     = 300
+}
+
+variable "ecs_request_count_autoscale_scale_out_cooldown" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy#scale_out_cooldown"
+  type        = number
+  default     = 60
+}
