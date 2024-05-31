@@ -41,7 +41,7 @@ resource "aws_appautoscaling_policy" "request_count_per_target" {
     }
 
     target_value       = var.ecs_request_count_autoscale_target_value
-    scale_in_cooldown  = var.ecs_request_count_autoscale_scale_in_cooldown
-    scale_out_cooldown = var.ecs_request_count_autoscale_scale_out_cooldown
+    scale_in_cooldown  = var.scale_in_cooldown
+    scale_out_cooldown = var.scale_out_cooldown
   }
 }
