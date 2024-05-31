@@ -72,7 +72,7 @@ module "acm" {
 }
 
 module "core" {
-  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.114-758b2d1"
+  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=f2d757598b2ba38fbef4856f4567631e5d3a2855"
   git                       = local.git
   name                      = local.git
   vpc_id                    = data.aws_vpcs.this.ids[0]
@@ -95,6 +95,7 @@ module "autoscale" {
   security_groups                           = [module.core.ecs_app_security_group]
   execution_role_arn                        = module.core.execution_ecs_role_arn
   enable_ecs_request_count_target_autoscale = true
+  load_balancer_arn_suffix                  = module.core.lb_private_arn_suffix
   enable_load_balancer                      = false
   enable_route53                            = false
   name                                      = "autoscale"

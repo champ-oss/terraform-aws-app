@@ -482,3 +482,9 @@ variable "ecs_request_count_autoscale_target_value" {
   type        = number
   default     = 100
 }
+
+variable "load_balancer_arn_suffix" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule#load_balancer_arn_suffix"
+  type        = string
+  default     = ""
+}
