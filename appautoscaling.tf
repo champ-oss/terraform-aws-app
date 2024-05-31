@@ -37,6 +37,7 @@ resource "aws_appautoscaling_policy" "request_count_per_target" {
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
       predefined_metric_type = "ALBRequestCountPerTarget"
+      resource_label         = aws_appautoscaling_target.this.resource_id
     }
 
     target_value       = var.ecs_request_count_autoscale_target_value
