@@ -32,8 +32,8 @@ resource "aws_appautoscaling_policy" "request_count_per_target" {
   name               = "${var.git}-${var.name}-request-count-per-target"
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.this.resource_id
-  scalable_dimension = "ecs:service:DesiredCount"
-  service_namespace  = "ecs"
+  scalable_dimension = aws_appautoscaling_target.this.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.this.service_namespace
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
