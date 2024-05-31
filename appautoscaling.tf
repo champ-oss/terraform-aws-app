@@ -37,11 +37,16 @@ resource "aws_appautoscaling_policy" "request_count_per_target" {
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
       predefined_metric_type = "ALBRequestCountPerTarget"
-      resource_label         = "${var.load_balancer_arn_suffix}/${aws_lb_target_group.this.arn_suffix}"
+      resource_label         = "${var.load_balancer_arn_suffix}/${data.aws_arn.alb_target_group[0].resource}"
     }
 
     target_value       = var.ecs_request_count_autoscale_target_value
     scale_in_cooldown  = var.scale_in_cooldown
     scale_out_cooldown = var.scale_out_cooldown
   }
+}
+
+data "aws_arn" "alb_target_group" {
+  count = var.enable_ecs_request_count_target_autoscale ? 1 : 0
+  arn = aws_lb_target_group.this.arn
 }
