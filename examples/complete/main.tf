@@ -152,7 +152,7 @@ module "this" {
   retention_in_days                  = 3
   enable_execute_command             = true
   autoscaling_predefined_metric_type = "ALBRequestCountPerTarget"
-  autoscaling_target_value           = 5
+  autoscaling_target_value           = 50
   alb_arn_suffix                     = module.core.lb_public_arn_suffix
   min_capacity                       = 1
   max_capacity                       = 20
