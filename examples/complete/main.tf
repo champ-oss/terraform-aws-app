@@ -155,7 +155,7 @@ module "this" {
   autoscaling_target_value           = 5
   alb_arn_suffix                     = module.core.lb_public_arn_suffix
   min_capacity                       = 1
-  max_capacity                       = 10
+  max_capacity                       = 20
   scale_in_cooldown                  = 30
   scale_out_cooldown                 = 30
 
