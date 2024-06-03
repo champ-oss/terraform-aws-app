@@ -152,7 +152,12 @@ module "this" {
   retention_in_days                  = 3
   enable_execute_command             = true
   autoscaling_predefined_metric_type = "ALBRequestCountPerTarget"
+  autoscaling_target_value           = 5
   alb_arn_suffix                     = module.core.lb_public_arn_suffix
+  min_capacity                       = 1
+  max_capacity                       = 10
+  scale_in_cooldown                  = 30
+  scale_out_cooldown                 = 30
 
   environment = {
     this  = "that"
