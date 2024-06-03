@@ -119,22 +119,19 @@ resource "aws_ssm_parameter" "secret2" {
 }
 
 module "this" {
-  source                             = "../../"
-  git                                = local.git
-  vpc_id                             = data.aws_vpcs.this.ids[0]
-  subnets                            = data.aws_subnets.private.ids
-  zone_id                            = data.aws_route53_zone.this.zone_id
-  cluster                            = module.core.ecs_cluster_name
-  security_groups                    = [module.core.ecs_app_security_group]
-  execution_role_arn                 = module.core.execution_ecs_role_arn
-  listener_arn                       = module.core.lb_public_listener_arn
-  lb_dns_name                        = module.core.lb_public_dns_name
-  lb_zone_id                         = module.core.lb_public_zone_id
-  enable_route53                     = true
-  enable_route53_health_check        = true
-  autoscaling_predefined_metric_type = "ALBRequestCountPerTarget"
-  alb_arn_suffix                     = module.core.lb_public_arn_suffix
-
+  source                      = "../../"
+  git                         = local.git
+  vpc_id                      = data.aws_vpcs.this.ids[0]
+  subnets                     = data.aws_subnets.private.ids
+  zone_id                     = data.aws_route53_zone.this.zone_id
+  cluster                     = module.core.ecs_cluster_name
+  security_groups             = [module.core.ecs_app_security_group]
+  execution_role_arn          = module.core.execution_ecs_role_arn
+  listener_arn                = module.core.lb_public_listener_arn
+  lb_dns_name                 = module.core.lb_public_dns_name
+  lb_zone_id                  = module.core.lb_public_zone_id
+  enable_route53              = true
+  enable_route53_health_check = true
   #
   /* stickiness example
   stickiness = [{
@@ -145,15 +142,17 @@ module "this" {
   */
 
   # app specific variables
-  name                              = "test"
-  dns_name                          = "${local.git}.${data.aws_route53_zone.this.name}"
-  image                             = "testcontainers/helloworld"
-  healthcheck                       = "/ping"
-  port                              = 8080
-  health_check_grace_period_seconds = 5
-  deregistration_delay              = 5
-  retention_in_days                 = 3
-  enable_execute_command            = true
+  name                               = "test"
+  dns_name                           = "${local.git}.${data.aws_route53_zone.this.name}"
+  image                              = "testcontainers/helloworld"
+  healthcheck                        = "/ping"
+  port                               = 8080
+  health_check_grace_period_seconds  = 5
+  deregistration_delay               = 5
+  retention_in_days                  = 3
+  enable_execute_command             = true
+  autoscaling_predefined_metric_type = "ALBRequestCountPerTarget"
+  alb_arn_suffix                     = module.core.lb_public_arn_suffix
 
   environment = {
     this  = "that"

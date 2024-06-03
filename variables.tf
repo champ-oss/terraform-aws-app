@@ -471,12 +471,6 @@ variable "enable_wait_for_ecr" {
   default     = false
 }
 
-variable "alb_scaling_target_resource_id" {
-  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_target#resource_id"
-  type        = string
-  default     = ""
-}
-
 variable "alb_arn_suffix" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_target#resource_id"
   type        = string
