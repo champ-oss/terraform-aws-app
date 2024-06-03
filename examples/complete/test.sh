@@ -8,5 +8,5 @@ aws ssm get-parameter --with-decryption --name $SSM_KMS_TEST_2 --query 'Paramete
 aws ssm get-parameter --with-decryption --name $SSM_SSM_TEST_1 --query 'Parameter.Value' | grep "kms secret 2"
 
 curl -s https://$DNS_NAME/ | grep "Hello world"
-sleep 3600
+
 
