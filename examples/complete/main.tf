@@ -73,7 +73,7 @@ module "acm" {
 }
 
 module "core" {
-  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.117-1ea02a2"
+  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=f2d757598b2ba38fbef4856f4567631e5d3a2855"
   git                       = local.git
   name                      = local.git
   vpc_id                    = data.aws_vpcs.this.ids[0]
@@ -132,7 +132,6 @@ module "this" {
   lb_zone_id                  = module.core.lb_public_zone_id
   enable_route53              = true
   enable_route53_health_check = true
-
   #
   /* stickiness example
   stickiness = [{
@@ -143,15 +142,22 @@ module "this" {
   */
 
   # app specific variables
-  name                              = "test"
-  dns_name                          = "${local.git}.${data.aws_route53_zone.this.name}"
-  image                             = "testcontainers/helloworld"
-  healthcheck                       = "/ping"
-  port                              = 8080
-  health_check_grace_period_seconds = 5
-  deregistration_delay              = 5
-  retention_in_days                 = 3
-  enable_execute_command            = true
+  name                               = "test"
+  dns_name                           = "${local.git}.${data.aws_route53_zone.this.name}"
+  image                              = "testcontainers/helloworld"
+  healthcheck                        = "/ping"
+  port                               = 8080
+  health_check_grace_period_seconds  = 5
+  deregistration_delay               = 5
+  retention_in_days                  = 3
+  enable_execute_command             = true
+  autoscaling_predefined_metric_type = "ALBRequestCountPerTarget"
+  autoscaling_target_value           = 50
+  alb_arn_suffix                     = module.core.lb_public_arn_suffix
+  min_capacity                       = 1
+  max_capacity                       = 10
+  scale_in_cooldown                  = 30
+  scale_out_cooldown                 = 30
 
   environment = {
     this  = "that"

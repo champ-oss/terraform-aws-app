@@ -40,6 +40,7 @@ data "aws_subnets" "public" {
     values = [data.aws_vpcs.this.ids[0]]
   }
 }
+
 terraform {
   required_version = ">= 1.5.0"
   required_providers {

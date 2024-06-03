@@ -18,9 +18,10 @@ resource "aws_appautoscaling_policy" "this" {
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
       predefined_metric_type = var.autoscaling_predefined_metric_type
+      resource_label         = var.autoscaling_predefined_metric_type == "ALBRequestCountPerTarget" ? "${var.alb_arn_suffix}/${aws_lb_target_group.this.arn_suffix}" : null
     }
 
-    target_value       = var.autoscaling_target_cpu
+    target_value       = var.autoscaling_target_value
     scale_in_cooldown  = var.scale_in_cooldown
     scale_out_cooldown = var.scale_out_cooldown
   }

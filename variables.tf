@@ -231,7 +231,7 @@ variable "min_capacity" {
   default     = 1
 }
 
-variable "autoscaling_target_cpu" {
+variable "autoscaling_target_value" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy#target_value"
   type        = number
   default     = 75
@@ -469,4 +469,10 @@ variable "enable_wait_for_ecr" {
   description = "Wait for the ECR image tag to become available"
   type        = bool
   default     = false
+}
+
+variable "alb_arn_suffix" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_target#resource_id"
+  type        = string
+  default     = ""
 }

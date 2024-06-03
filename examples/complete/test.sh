@@ -9,3 +9,4 @@ aws ssm get-parameter --with-decryption --name $SSM_SSM_TEST_1 --query 'Paramete
 
 curl -s https://$DNS_NAME/ | grep "Hello world"
 
+
