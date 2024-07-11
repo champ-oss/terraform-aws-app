@@ -1,13 +1,13 @@
 locals {
   route53_health_check_resource_path = (
     var.enable_public_healthcheck_rule ?
-    "${aws_lb_target_group.this.health_check[0].path}?${var.healthcheck_query_parameter}=${random_password.healthcheck[0].result}" :
-    aws_lb_target_group.this.health_check[0].path
+    "${aws_lb_target_group.this[0].health_check.path}?${var.healthcheck_query_parameter}=${random_password.healthcheck[0].result}" :
+    aws_lb_target_group.this[0].health_check.path
   )
 }
 
 resource "aws_route53_health_check" "this" {
-  count             = var.enabled && var.enable_route53_health_check && aws_appautoscaling_target.this.min_capacity != 0 ? 1 : 0
+  count             = var.enabled && var.enable_route53_health_check && aws_appautoscaling_target.this[0].min_capacity != 0 ? 1 : 0
   fqdn              = try(aws_route53_record.this[0].name, "fallback")
   port              = var.health_check_port
   type              = var.health_check_type

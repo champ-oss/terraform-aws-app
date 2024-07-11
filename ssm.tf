@@ -3,7 +3,7 @@ locals {
 }
 
 data "aws_kms_secrets" "this" {
-  for_each = var.kms_secrets && var.enabled ? var.kms_secrets : {}
+  for_each = var.kms_secrets ? var.kms_secrets : {}
   secret {
     name    = each.key
     payload = each.value
@@ -29,7 +29,7 @@ resource "aws_ssm_parameter" "dns" {
   overwrite   = var.overwrite_ssm
   tags = merge({
     dns_endpoint = aws_route53_record.this[0].name
-    dns_path     = try(aws_lb_target_group.this.health_check[0].path, "")
+    dns_path     = try(aws_lb_target_group.this[0].health_check.path, "")
   }, local.tags, var.tags)
 
   lifecycle {

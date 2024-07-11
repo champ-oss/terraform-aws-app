@@ -31,7 +31,7 @@ resource "null_resource" "wait_for_ecr" {
     environment = {
       RETRIES    = 60
       SLEEP      = 10
-      AWS_REGION = data.aws_region.this.name
+      AWS_REGION = data.aws_region.this[0].name
       IMAGE      = var.image
     }
   }
