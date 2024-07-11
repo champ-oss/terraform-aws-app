@@ -35,6 +35,6 @@ moved {
 
 
 moved {
-  from = module.route53_health_check[0]
+  from = module.route53_health_check[0].aws_route53_health_check.this
   to   = aws_route53_health_check.this[0]
 }
