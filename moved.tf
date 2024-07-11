@@ -33,6 +33,10 @@ moved {
   to   = data.aws_region.this[0]
 }
 
+moved {
+  from = aws_lb_target_group.this
+  to   = aws_lb_target_group.this[0]
+}
 
 moved {
   from = module.route53_health_check[0].aws_route53_health_check.this

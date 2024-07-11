@@ -31,11 +31,6 @@ resource "aws_lb_target_group" "this" {
   }
 }
 
-moved {
-  from = aws_lb_target_group.this
-  to   = aws_lb_target_group.this[0]
-}
-
 locals {
   # Split the list of source IPs into smaller lists of 4 items each (max of 5 condition values per rule, including host-header)
   ip_groups = chunklist(var.source_ips, 4)
