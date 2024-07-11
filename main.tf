@@ -10,7 +10,7 @@ locals {
     component = var.name
   }
   name_tag = {
-    Name = aws_route53_record.this[0].name != "" ? aws_route53_record.this[0].name : var.name
+    Name = try(aws_route53_record.this[0].name, "")
   }
 }
 
