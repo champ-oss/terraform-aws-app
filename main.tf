@@ -1,4 +1,6 @@
-data "aws_region" "this" {}
+data "aws_region" "this" {
+  count = var.enabled ? 1 : 0
+}
 
 locals {
   tags = {
@@ -13,13 +15,13 @@ locals {
 }
 
 resource "random_password" "healthcheck" {
-  count   = var.enable_public_healthcheck_rule ? 1 : 0
+  count   = var.enable_public_healthcheck_rule && var.enabled ? 1 : 0
   length  = 32
   special = false
 }
 
 resource "null_resource" "wait_for_ecr" {
-  count = var.enable_wait_for_ecr ? 1 : 0
+  count = var.enable_wait_for_ecr && var.enabled ? 1 : 0
   triggers = {
     image = var.image
   }

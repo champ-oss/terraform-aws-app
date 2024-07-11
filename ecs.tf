@@ -25,8 +25,8 @@ locals {
         logDriver = "awslogs"
 
         options = {
-          awslogs-group         = aws_cloudwatch_log_group.this.name
-          awslogs-region        = data.aws_region.this.name
+          awslogs-group         = aws_cloudwatch_log_group.this[0].name
+          awslogs-region        = data.aws_region.this[0].name
           awslogs-stream-prefix = "ecs"
         }
       }
@@ -35,6 +35,7 @@ locals {
 }
 
 resource "aws_ecs_task_definition" "this" {
+  count                    = var.enabled ? 1 : 0
   family                   = "${var.git}-${var.name}"
   container_definitions    = jsonencode(local.container)
   execution_role_arn       = var.execution_role_arn
@@ -47,10 +48,10 @@ resource "aws_ecs_task_definition" "this" {
 }
 
 resource "aws_ecs_service" "this" {
-  count                              = var.enable_load_balancer ? 1 : 0
+  count                              = var.enable_load_balancer && var.enabled ? 1 : 0
   name                               = var.name
   cluster                            = var.cluster
-  task_definition                    = aws_ecs_task_definition.this.arn
+  task_definition                    = aws_ecs_task_definition.this[0].arn
   launch_type                        = "FARGATE"
   propagate_tags                     = "SERVICE"
   health_check_grace_period_seconds  = var.health_check_grace_period_seconds
@@ -62,7 +63,7 @@ resource "aws_ecs_service" "this" {
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.this.id
+    target_group_arn = aws_lb_target_group.this[0].id
     container_name   = local.container[0].name
     container_port   = var.port
   }
@@ -84,10 +85,10 @@ resource "aws_ecs_service" "this" {
 
 resource "aws_ecs_service" "disabled_load_balancer" {
   depends_on                         = [null_resource.wait_for_ecr]
-  count                              = var.enable_load_balancer ? 0 : 1
+  count                              = var.enable_load_balancer == false && var.enabled ? 1 : 0
   name                               = var.name
   cluster                            = var.cluster
-  task_definition                    = aws_ecs_task_definition.this.arn
+  task_definition                    = aws_ecs_task_definition.this[0].arn
   launch_type                        = "FARGATE"
   propagate_tags                     = "SERVICE"
   wait_for_steady_state              = var.wait_for_steady_state

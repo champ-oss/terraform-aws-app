@@ -1,4 +1,5 @@
 resource "aws_lb_target_group" "this" {
+  count                = var.enabled ? 1 : 0
   port                 = var.port
   protocol             = "HTTP"
   vpc_id               = var.vpc_id
@@ -30,6 +31,11 @@ resource "aws_lb_target_group" "this" {
   }
 }
 
+moved {
+  from = aws_lb_target_group.this
+  to   = aws_lb_target_group.this[0]
+}
+
 locals {
   # Split the list of source IPs into smaller lists of 4 items each (max of 5 condition values per rule, including host-header)
   ip_groups = chunklist(var.source_ips, 4)
@@ -39,7 +45,7 @@ locals {
 }
 
 resource "aws_lb_listener_rule" "this" {
-  count        = var.enable_load_balancer ? local.rule_count : 0
+  count        = var.enable_load_balancer && var.enabled ? local.rule_count : 0
   depends_on   = [aws_lb_target_group.this]
   listener_arn = var.listener_arn
   tags         = merge(local.tags, var.tags)
@@ -85,7 +91,7 @@ resource "aws_lb_listener_rule" "this" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.this.arn
+    target_group_arn = aws_lb_target_group.this[0].arn
   }
 
   condition {
@@ -106,14 +112,14 @@ resource "aws_lb_listener_rule" "this" {
 }
 
 resource "aws_lb_listener_rule" "public_healthcheck" {
-  count        = var.enable_load_balancer && var.enable_public_healthcheck_rule ? 1 : 0
+  count        = var.enable_load_balancer && var.enable_public_healthcheck_rule && var.enabled ? 1 : 0
   depends_on   = [aws_lb_target_group.this]
   listener_arn = var.listener_arn
   tags         = merge(local.tags, var.tags)
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.this.arn
+    target_group_arn = aws_lb_target_group.this[0].arn
   }
 
   condition {
@@ -135,4 +141,3 @@ resource "aws_lb_listener_rule" "public_healthcheck" {
     }
   }
 }
-

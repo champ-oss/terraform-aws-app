@@ -63,6 +63,12 @@ resource "random_id" "this" {
   byte_length = 2
 }
 
+variable "enabled" {
+  description = "module enabled"
+  type        = bool
+  default     = true
+}
+
 module "acm" {
   source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.114-1c756c3"
   git               = local.git
@@ -109,6 +115,7 @@ module "this" {
   enable_route53                    = true
   enable_route53_health_check       = true
   enable_public_healthcheck_rule    = true
+  enabled                           = var.enabled
   name                              = "test"
   dns_name                          = "${local.git}.${data.aws_route53_zone.this.name}"
   image                             = "testcontainers/helloworld"
@@ -137,4 +144,9 @@ output "route53_health_check_resource_path" {
   description = "Path for healthcheck including secret"
   sensitive   = true
   value       = module.this.route53_health_check_resource_path
+}
+
+output "enabled" {
+  description = "module enabled"
+  value       = var.enabled
 }

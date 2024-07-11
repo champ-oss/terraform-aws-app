@@ -63,6 +63,12 @@ resource "random_id" "this" {
   byte_length = 2
 }
 
+variable "enabled" {
+  description = "module enabled"
+  type        = bool
+  default     = true
+}
+
 module "acm" {
   source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.116-cd36b2b"
   git               = local.git
@@ -132,6 +138,7 @@ module "this" {
   lb_zone_id                  = module.core.lb_public_zone_id
   enable_route53              = true
   enable_route53_health_check = true
+  enabled                     = var.enabled
   #
   /* stickiness example
   stickiness = [{
@@ -196,4 +203,9 @@ output "ssm_kms_test_2" {
 output "ssm_ssm_test_1" {
   description = "SSM parameter name"
   value       = [for param in module.this.aws_ssm_parameter_names : param if endswith(param, "SSMTEST2")]
+}
+
+output "enabled" {
+  description = "module enabled"
+  value       = var.enabled
 }
