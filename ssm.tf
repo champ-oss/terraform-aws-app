@@ -29,7 +29,7 @@ resource "aws_ssm_parameter" "dns" {
   overwrite   = var.overwrite_ssm
   tags = merge({
     dns_endpoint = aws_route53_record.this[0].name
-    dns_path     = try(aws_lb_target_group.this[0].health_check.path, "")
+    dns_path     = try(aws_lb_target_group.this[0].health_check[0].path, "")
   }, local.tags, var.tags)
 
   lifecycle {
