@@ -11,7 +11,7 @@ data "aws_kms_secrets" "this" {
 }
 
 resource "aws_ssm_parameter" "this" {
-  for_each    = data.aws_kms_secrets.this[0] && var.enabled ? data.aws_kms_secrets.this[0] : {}
+  for_each    = data.aws_kms_secrets.this[0]
   description = "Do not modify. Managed by Terraform from terraform-aws-app"
   name        = "${local.ssm_prefix}${each.key}"
   type        = "SecureString"
