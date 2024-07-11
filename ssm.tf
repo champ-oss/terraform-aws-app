@@ -3,7 +3,7 @@ locals {
 }
 
 data "aws_kms_secrets" "this" {
-  for_each = var.kms_secrets ? var.kms_secrets : {}
+  for_each = var.kms_secrets
   secret {
     name    = each.key
     payload = each.value
