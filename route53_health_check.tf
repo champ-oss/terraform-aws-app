@@ -10,7 +10,7 @@ resource "aws_route53_health_check" "this" {
   fqdn              = try(aws_route53_record.this[0].name, "fallback")
   port              = var.health_check_port
   type              = var.health_check_type
-  resource_path     = local.route53_health_check_resource_path
+  resource_path     = try(local.route53_health_check_resource_path, "")
   failure_threshold = 3
   request_interval  = 30
   regions           = ["us-east-1", "us-west-1", "us-west-2"]
