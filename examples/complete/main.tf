@@ -70,12 +70,13 @@ variable "enabled" {
 }
 
 module "acm" {
-  source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.116-cd36b2b"
+  source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.117-6aa9478"
   git               = local.git
   domain_name       = "${local.git}.${data.aws_route53_zone.this.name}"
   create_wildcard   = false
   zone_id           = data.aws_route53_zone.this.zone_id
   enable_validation = true
+  enabled           = var.enabled
 }
 
 module "core" {
@@ -94,24 +95,28 @@ module "core" {
 }
 
 module "kms" {
-  source                  = "github.com/champ-oss/terraform-aws-kms.git?ref=v1.0.33-cb3be31"
+  source                  = "github.com/champ-oss/terraform-aws-kms.git?ref=v1.0.34-a5b529e"
   git                     = local.git
   name                    = "alias/${local.git}-${random_id.this.hex}"
   deletion_window_in_days = 7
   account_actions         = []
+  enabled                 = var.enabled
 }
 
 resource "aws_kms_ciphertext" "secret1" {
+  count     = var.enabled ? 1 : 0
   key_id    = module.kms.key_id
   plaintext = "kms secret 1"
 }
 
 resource "aws_kms_ciphertext" "secret2" {
+  count     = var.enabled ? 1 : 0
   key_id    = module.kms.key_id
   plaintext = "kms secret 2"
 }
 
 resource "aws_ssm_parameter" "secret1" {
+  count = var.enabled ? 1 : 0
   name  = "${local.git}-${random_id.this.hex}-1"
   type  = "SecureString"
   value = "ssm secret 1"
@@ -119,6 +124,7 @@ resource "aws_ssm_parameter" "secret1" {
 }
 
 resource "aws_ssm_parameter" "secret2" {
+  count = var.enabled ? 1 : 0
   name  = "${local.git}-${random_id.this.hex}-2"
   type  = "SecureString"
   value = "ssm secret 2"
@@ -173,16 +179,16 @@ module "this" {
   }
 
   secrets = {
-    SSMTEST1 = aws_ssm_parameter.secret1.name
-    SSMTEST2 = aws_ssm_parameter.secret2.name
+    SSMTEST1 = aws_ssm_parameter.secret1[0].name
+    SSMTEST2 = aws_ssm_parameter.secret2[0].name
   }
 
   kms_secrets = {
-    KMSTEST1 = aws_kms_ciphertext.secret1.ciphertext_blob
-    KMSTEST2 = aws_kms_ciphertext.secret2.ciphertext_blob
+    KMSTEST1 = aws_kms_ciphertext.secret1[0].ciphertext_blob
+    KMSTEST2 = aws_kms_ciphertext.secret2[0].ciphertext_blob
 
     # Test overriding a ssm "secret" with a "kms_secret"
-    SSMTEST2 = aws_kms_ciphertext.secret2.ciphertext_blob
+    SSMTEST2 = aws_kms_ciphertext.secret2[0].ciphertext_blob
   }
 }
 
