@@ -66,7 +66,7 @@ resource "random_id" "this" {
 variable "enabled" {
   description = "module enabled"
   type        = bool
-  default     = true
+  default     = false
 }
 
 module "hash" {
