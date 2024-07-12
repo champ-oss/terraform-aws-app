@@ -66,7 +66,7 @@ resource "random_id" "this" {
 variable "enabled" {
   description = "module enabled"
   type        = bool
-  default     = false
+  default     = true
 }
 
 module "acm" {
