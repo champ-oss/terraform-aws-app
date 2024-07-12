@@ -90,6 +90,7 @@ module "core" {
   tags                      = local.tags
   certificate_arn           = module.acm.arn
   enable_container_insights = false
+  enabled                   = var.enabled
 }
 
 module "kms" {
