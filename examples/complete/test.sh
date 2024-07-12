@@ -9,5 +9,5 @@ if [ "$ENABLED" = "true" ]; then
 
   curl -s https://$DNS_NAME/ | grep "Hello world"
 else
-  echo "Module is disabled, no resources created"
+  echo "Module is disabled, no resources created for this test"
 fi
