@@ -1,9 +1,17 @@
+locals {
+  route53_health_check_resource_path = (
+    var.enable_public_healthcheck_rule ?
+    "${aws_lb_target_group.this.health_check[0].path}?${var.healthcheck_query_parameter}=${random_password.healthcheck[0].result}" :
+    aws_lb_target_group.this.health_check[0].path
+  )
+}
+
 resource "aws_route53_health_check" "this" {
   count             = var.enabled && var.enable_route53_health_check ? 1 : 0
   fqdn              = try(aws_route53_record.this[0].name, "fallback")
   port              = var.health_check_port
   type              = var.health_check_type
-  resource_path     = try("${aws_lb_target_group.this[0].health_check[0].path}?${var.healthcheck_query_parameter}=${random_password.healthcheck[0].result}", "")
+  resource_path     = try(local.route53_health_check_resource_path, "")
   failure_threshold = 3
   request_interval  = 30
   regions           = ["us-east-1", "us-west-1", "us-west-2"]
