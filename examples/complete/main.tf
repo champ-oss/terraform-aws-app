@@ -179,8 +179,8 @@ module "this" {
   }
 
   secrets = {
-    SSMTEST1 = aws_ssm_parameter.secret1[0].name
-    SSMTEST2 = aws_ssm_parameter.secret2[0].name
+    SSMTEST1 = try(aws_ssm_parameter.secret1[0].name, "")
+    SSMTEST2 = try(aws_ssm_parameter.secret2[0].name, "")
   }
 
   kms_secrets = {
