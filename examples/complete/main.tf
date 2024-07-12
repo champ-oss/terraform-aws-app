@@ -184,11 +184,11 @@ module "this" {
   }
 
   kms_secrets = {
-    KMSTEST1 = aws_kms_ciphertext.secret1[0].ciphertext_blob
-    KMSTEST2 = aws_kms_ciphertext.secret2[0].ciphertext_blob
+    KMSTEST1 = try(aws_kms_ciphertext.secret1[0].ciphertext_blob, "")
+    KMSTEST2 = try(aws_kms_ciphertext.secret2[0].ciphertext_blob, "")
 
     # Test overriding a ssm "secret" with a "kms_secret"
-    SSMTEST2 = aws_kms_ciphertext.secret2[0].ciphertext_blob
+    SSMTEST2 = try(aws_kms_ciphertext.secret2[0].ciphertext_blob, "")
   }
 }
 
