@@ -5,15 +5,15 @@ locals {
 
   # Create a env variable whose value will change any time a KMS value is changed. This is a way of forcing ECS
   # service to cycle any time KMS values are updated.
-  kms_secrets_sha = try({ KMS_SECRETS_SHA = sha256(jsonencode(var.kms_secrets)) }, {})
+  kms_secrets_sha = { KMS_SECRETS_SHA = sha256(jsonencode(var.kms_secrets)) }
 
   container = [
     {
       name        = "this"
       image       = var.image
       essential   = true
-      environment = try([for key, value in merge(var.environment, local.kms_secrets_sha) : { name = key, value = value }], [])
-      secrets     = try([for key, value in merge(var.secrets, local.kms_ssm) : { name = key, valueFrom = value }], [])
+      environment = [for key, value in merge(var.environment, local.kms_secrets_sha) : { name = key, value = value }]
+      secrets     = [for key, value in merge(var.secrets, local.kms_ssm) : { name = key, valueFrom = value }]
       command     = var.command
       portMappings = [
         {
