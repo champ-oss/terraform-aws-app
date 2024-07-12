@@ -15,7 +15,7 @@ output "target_group_arn" {
 
 output "aws_ssm_parameter_names" {
   description = "List of SSM parameter names"
-  value       = var.enabled ? [for param in aws_ssm_parameter.this : param.name] : ""
+  value       = var.enabled ? [for param in aws_ssm_parameter.this : param.name] : []
 }
 
 output "route53_health_check_resource_path" {
