@@ -37,7 +37,7 @@ locals {
 resource "aws_ecs_task_definition" "this" {
   count                    = var.enabled ? 1 : 0
   family                   = "${var.git}-${var.name}"
-  container_definitions    = jsonencode(local.container)
+  container_definitions    = try(jsonencode(local.container), "")
   execution_role_arn       = var.execution_role_arn
   task_role_arn            = var.execution_role_arn
   requires_compatibilities = ["FARGATE"]
