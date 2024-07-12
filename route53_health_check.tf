@@ -1,8 +1,8 @@
 locals {
   route53_health_check_resource_path = (
     var.enable_public_healthcheck_rule ?
-    "${aws_lb_target_group.this[0].health_check[0].path}?${var.healthcheck_query_parameter}=${random_password.healthcheck[0].result}" :
-    aws_lb_target_group.this[0].health_check[0].path
+    try("${aws_lb_target_group.this[0].health_check[0].path}?${var.healthcheck_query_parameter}=${random_password.healthcheck[0].result}", "") :
+    try(aws_lb_target_group.this[0].health_check[0].path, "")
   )
 }
 
