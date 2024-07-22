@@ -63,17 +63,24 @@ resource "random_id" "this" {
   byte_length = 2
 }
 
+variable "enabled" {
+  description = "module enabled"
+  type        = bool
+  default     = true
+}
+
 module "acm" {
-  source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.114-1c756c3"
+  source            = "github.com/champ-oss/terraform-aws-acm.git?ref=v1.0.117-6aa9478"
   git               = local.git
   domain_name       = "${local.git}.${data.aws_route53_zone.this.name}"
   create_wildcard   = false
   zone_id           = data.aws_route53_zone.this.zone_id
   enable_validation = true
+  enabled           = var.enabled
 }
 
 module "core" {
-  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.114-758b2d1"
+  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.119-061bf8b"
   git                       = local.git
   name                      = local.git
   vpc_id                    = data.aws_vpcs.this.ids[0]
@@ -84,14 +91,16 @@ module "core" {
   tags                      = local.tags
   certificate_arn           = module.acm.arn
   enable_container_insights = false
+  enabled                   = var.enabled
 }
 
 module "kms" {
-  source                  = "github.com/champ-oss/terraform-aws-kms.git?ref=v1.0.31-3fc28eb"
+  source                  = "github.com/champ-oss/terraform-aws-kms.git?ref=v1.0.34-a5b529e"
   git                     = local.git
   name                    = "alias/${local.git}-${random_id.this.hex}"
   deletion_window_in_days = 7
   account_actions         = []
+  enabled                 = var.enabled
 }
 
 module "this" {
@@ -109,6 +118,7 @@ module "this" {
   enable_route53                    = true
   enable_route53_health_check       = true
   enable_public_healthcheck_rule    = true
+  enabled                           = var.enabled
   name                              = "test"
   dns_name                          = "${local.git}.${data.aws_route53_zone.this.name}"
   image                             = "testcontainers/helloworld"
@@ -137,4 +147,9 @@ output "route53_health_check_resource_path" {
   description = "Path for healthcheck including secret"
   sensitive   = true
   value       = module.this.route53_health_check_resource_path
+}
+
+output "enabled" {
+  description = "module enabled"
+  value       = var.enabled
 }
