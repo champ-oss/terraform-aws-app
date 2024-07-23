@@ -14,7 +14,7 @@ A Terraform module for creating an AWS ECS Service
 
 ## Example Usage
 
-See the `examples/` folder
+See details in the `examples/` folder
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
