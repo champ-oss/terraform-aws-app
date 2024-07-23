@@ -8,4 +8,3 @@ resource "aws_cloudwatch_log_group" "this" {
     ignore_changes = [name]
   }
 }
-
