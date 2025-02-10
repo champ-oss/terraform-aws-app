@@ -25,9 +25,9 @@ locals {
         logDriver = "awslogs"
 
         options = {
-          awslogs-group         = try(aws_cloudwatch_log_group.this[0].name, "")
-          awslogs-region        = try(data.aws_region.this[0].name, "")
-          awslogs-stream-prefix = "ecs"
+          awslogs-group             = try(aws_cloudwatch_log_group.this[0].name, "")
+          awslogs-region            = try(data.aws_region.this[0].name, "")
+          awslogs-stream-prefix     = "ecs"
           awslogs-multiline-pattern = "\"^[|DEBUG|INFO|WARNING|ERROR\"",
         }
       }
