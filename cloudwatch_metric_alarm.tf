@@ -1,7 +1,7 @@
 resource "aws_cloudwatch_metric_alarm" "cpu_avg_utilization" {
   count = var.enabled && var.metric_alarms_enabled ? 1 : 0
 
-  alarm_name          = "${var.name}-cpu-avg-utilization"
+  alarm_name          = "${var.git}-cpu-avg-utilization"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 5
   metric_name         = "CPUUtilization"
@@ -21,7 +21,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_avg_utilization" {
 resource "aws_cloudwatch_metric_alarm" "memory_avg_utilization" {
   count = var.enabled && var.metric_alarms_enabled ? 1 : 0
 
-  alarm_name          = "${var.name}-memory-avg-utilization"
+  alarm_name          = "${var.git}-memory-avg-utilization"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 5
   metric_name         = "MemoryUtilization"
