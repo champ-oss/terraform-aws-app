@@ -1,7 +1,7 @@
 resource "aws_cloudwatch_metric_alarm" "cpu_avg_utilization" {
   count = var.enabled && var.metric_alarms_enabled ? 1 : 0
 
-  alarm_name          = "${var.git}-cpu-avg-utilization"
+  alarm_name          = "/${var.cluster}/${var.name}/cpu-avg-utilization"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 5
   metric_name         = "CPUUtilization"
@@ -12,6 +12,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_avg_utilization" {
   alarm_description   = "This metric monitors CPU utilization"
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
+  tags                = merge(local.tags, var.tags)
   dimensions = {
     ClusterName = var.cluster
     ServiceName = var.name
@@ -21,7 +22,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_avg_utilization" {
 resource "aws_cloudwatch_metric_alarm" "memory_avg_utilization" {
   count = var.enabled && var.metric_alarms_enabled ? 1 : 0
 
-  alarm_name          = "${var.git}-memory-avg-utilization"
+  alarm_name          = "/${var.cluster}/${var.name}/memory-avg-utilization"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 5
   metric_name         = "MemoryUtilization"
@@ -32,6 +33,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_avg_utilization" {
   alarm_description   = "This metric monitors memory utilization"
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
+  tags                = merge(local.tags, var.tags)
   dimensions = {
     ClusterName = var.cluster
     ServiceName = var.name
