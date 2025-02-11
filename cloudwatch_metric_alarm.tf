@@ -8,7 +8,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_avg_utilization" {
   namespace           = "AWS/ECS"
   period              = 60
   statistic           = "Average"
-  threshold           = var.cpu_avg_utilization_threshold # 80
+  threshold           = var.cpu_avg_utilization_threshold
   alarm_description   = "This metric monitors CPU utilization"
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
@@ -29,7 +29,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_avg_utilization" {
   namespace           = "AWS/ECS"
   period              = 60
   statistic           = "Average"
-  threshold           = var.memory_avg_utilization_threshold # 80
+  threshold           = var.memory_avg_utilization_threshold
   alarm_description   = "This metric monitors memory utilization"
   alarm_actions       = [var.sns_topic_arn]
   ok_actions          = [var.sns_topic_arn]
