@@ -482,3 +482,27 @@ variable "enabled" {
   type        = bool
   default     = true
 }
+
+variable "memory_avg_utilization_threshold" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy#target_tracking_scaling_policy_configuration"
+  type        = number
+  default     = 80
+}
+
+variable "cpu_avg_utilization_threshold" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/appautoscaling_policy#target_tracking_scaling_policy_configuration"
+  type        = number
+  default     = 80
+}
+
+variable "metric_alarms_enabled" {
+  description = "Enable metric alarms"
+  type        = bool
+  default     = false
+}
+
+variable "sns_topic_arn" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_metric_alarm#alarm_actions"
+  type        = string
+  default     = ""
+}
