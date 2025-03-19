@@ -518,9 +518,3 @@ variable "ecr_repository_name" {
     type        = string
     default     = ""
 }
-
-variable "ecr_image_tag" {
-    description = "ECR image tag"
-    type        = string
-    default     = "develop:latest"
-}
