@@ -81,6 +81,7 @@ resource "aws_cloudwatch_event_target" "step_function_target" {
 
 # IAM Role for EventBridge to invoke Step Functions
 resource "aws_iam_role" "eventbridge_role" {
+  count = var.enabled && var.ecs_auto_update ? 1 : 0
   name_prefix = "${var.git}-${var.name}-eventbridge-role"
 
   assume_role_policy = jsonencode({
