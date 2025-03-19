@@ -58,7 +58,7 @@ resource "aws_iam_policy_attachment" "ecs_update_policy" {
 # EventBridge Rule for ECR Image Push
 resource "aws_cloudwatch_event_rule" "this" {
   count       = var.enabled && var.enable_ecs_auto_update ? 1 : 0
-  name_prefix = "${var.git}-${var.name}-ecr-image-push-rule"
+  name_prefix = substr("${var.git}-${var.name}-ecr-image-push-rule", 0, 64)
   description = "Triggers Step Functions when an image with 'latest' tag is pushed to ECR"
   event_pattern = jsonencode({
     source      = ["aws.ecr"],
