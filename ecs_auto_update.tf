@@ -1,6 +1,6 @@
 resource "aws_sfn_state_machine" "this" {
   count = var.enabled && var.enable_ecs_auto_update ? 1 : 0
-  name  = substr("${var.git}-${var.name}", 0, 80)
+  name  = substr("${var.git}-${var.name}", 0, 64)
   definition = jsonencode({
     "Comment" : "State machine to update ECS service on new ECR image push",
     "StartAt" : "UpdateECSService",
@@ -31,7 +31,7 @@ resource "aws_sfn_state_machine" "this" {
 # IAM Role for Step Functions
 resource "aws_iam_role" "step_functions_role" {
   count       = var.enabled && var.enable_ecs_auto_update ? 1 : 0
-  name_prefix = substr("${var.git}-${var.name}-role", 0, 38)
+  name_prefix = var.git
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -58,7 +58,7 @@ resource "aws_iam_policy_attachment" "ecs_update_policy" {
 # EventBridge Rule for ECR Image Push
 resource "aws_cloudwatch_event_rule" "this" {
   count       = var.enabled && var.enable_ecs_auto_update ? 1 : 0
-  name_prefix = substr("${var.git}-${var.name}-ecr-image-push-rule", 0, 64)
+  name_prefix = var.git
   description = "Triggers Step Functions when an image with 'latest' tag is pushed to ECR"
   event_pattern = jsonencode({
     source      = ["aws.ecr"],
