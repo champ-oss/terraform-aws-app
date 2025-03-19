@@ -506,3 +506,21 @@ variable "sns_topic_arn" {
   type        = string
   default     = ""
 }
+
+variable "ecs_auto_update" {
+    description = "Enable ECS auto update"
+    type        = bool
+    default     = false
+}
+
+variable "ecr_repository_name" {
+    description = "ECR repository name"
+    type        = string
+    default     = ""
+}
+
+variable "ecr_image_tag" {
+    description = "ECR image tag"
+    type        = string
+    default     = "develop:latest"
+}
