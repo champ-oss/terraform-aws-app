@@ -21,7 +21,7 @@ resource "random_password" "healthcheck" {
 }
 
 resource "null_resource" "wait_for_ecr" {
-  count = var.enable_wait_for_ecr && var.enabled ? 1 : 0
+  count = var.enable_wait_for_ecr && var.enabled && !var.enable_ecs_auto_update ? 1 : 0
   triggers = {
     image = var.image
   }

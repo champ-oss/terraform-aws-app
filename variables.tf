@@ -116,6 +116,7 @@ variable "name" {
 variable "image" {
   description = "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#container_definition_image"
   type        = string
+  default     = "develop-latest"
 }
 
 variable "cpu" {
@@ -507,14 +508,20 @@ variable "sns_topic_arn" {
   default     = ""
 }
 
-variable "ecs_auto_update" {
-    description = "Enable ECS auto update"
-    type        = bool
-    default     = false
+variable "enable_ecs_auto_update" {
+  description = "Enable ECS auto update"
+  type        = bool
+  default     = false
 }
 
 variable "ecr_repository_name" {
-    description = "ECR repository name"
-    type        = string
-    default     = ""
+  description = "ECR repository name"
+  type        = string
+  default     = ""
+}
+
+variable "ecr_image_tag" {
+  description = "ECR image tag"
+  type        = string
+  default     = ""
 }
