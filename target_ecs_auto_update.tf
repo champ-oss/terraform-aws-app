@@ -10,6 +10,7 @@ resource "aws_cloudwatch_event_bus_policy" "allow_target_account" {
     Version = "2012-10-17",
     Statement = [
       {
+        sid    = "AllowCrossAccount",
         Effect = "Allow",
         Principal = {
           "AWS" : "arn:aws:iam::${var.source_ecr_account}:root"
