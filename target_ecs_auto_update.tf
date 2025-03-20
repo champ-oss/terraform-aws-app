@@ -15,7 +15,7 @@ resource "aws_cloudwatch_event_bus_policy" "allow_target_account" {
           "AWS" : "arn:aws:iam::${var.source_ecr_account}:root"
         },
         Action   = "events:PutEvents",
-        Resource = aws_cloudwatch_event_bus.cross_account_bus.arn
+        Resource = aws_cloudwatch_event_bus.cross_account_bus[0].arn
       }
     ]
   })
