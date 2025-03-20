@@ -25,7 +25,6 @@ resource "aws_cloudwatch_event_target" "step_function_target" {
   rule     = aws_cloudwatch_event_rule.trigger_step_function[0].name
   arn      = aws_sfn_state_machine.this[0].arn
   role_arn = aws_iam_role.eventbridge_role[0].arn
-  tags     = merge(local.tags, var.tags)
 }
 
 # IAM Role for Step Functions

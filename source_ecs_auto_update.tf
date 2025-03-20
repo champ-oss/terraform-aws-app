@@ -19,10 +19,9 @@ resource "aws_cloudwatch_event_rule" "ecr_image_push_rule" {
 
 # event bridge target to send events to aws_cloudwatch_event_bus in target account
 resource "aws_cloudwatch_event_target" "send_to_target_accounts" {
-  for_each = var.enabled && var.enable_source_ecr_event_bridge_rule ? toset(var.target_aws_cloudwatch_event_bus_arns) : {}
+  for_each = toset(var.target_aws_cloudwatch_event_bus_arns)
   rule     = aws_cloudwatch_event_rule.ecr_image_push_rule[0].name
   arn      = each.value
-  tags     = merge(local.tags, var.tags)
 }
 
 data "aws_iam_policy_document" "sts_event_policy" {
