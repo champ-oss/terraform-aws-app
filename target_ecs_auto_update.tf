@@ -46,10 +46,11 @@ resource "aws_cloudwatch_event_rule" "trigger_step_function" {
 }
 
 resource "aws_cloudwatch_event_target" "step_function_target" {
-  count    = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
-  rule     = aws_cloudwatch_event_rule.trigger_step_function[0].name
-  arn      = aws_sfn_state_machine.this[0].arn
-  role_arn = aws_iam_role.eventbridge_role[0].arn
+  count          = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
+  rule           = aws_cloudwatch_event_rule.trigger_step_function[0].name
+  arn            = aws_sfn_state_machine.this[0].arn
+  role_arn       = aws_iam_role.eventbridge_role[0].arn
+  event_bus_name = aws_cloudwatch_event_bus.cross_account_bus[0].name
 }
 
 # IAM Role for Step Functions
