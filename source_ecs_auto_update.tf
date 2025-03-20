@@ -21,6 +21,7 @@ resource "aws_cloudwatch_event_rule" "ecr_image_push_rule" {
 resource "aws_cloudwatch_event_target" "send_to_target_accounts" {
   for_each = toset(var.target_aws_cloudwatch_event_bus_arns)
   rule     = aws_cloudwatch_event_rule.ecr_image_push_rule[0].name
+  role_arn = aws_iam_role.cross_account_event_role[0].arn
   arn      = each.value
 }
 
