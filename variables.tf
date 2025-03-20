@@ -523,5 +523,11 @@ variable "ecr_repository_name" {
 variable "ecr_image_tag" {
   description = "ECR image tag"
   type        = string
-  default     = ""
+  default     = "develop-latest"
+}
+
+variable "enable_source_ecr_event_bridge_rule" {
+  description = "Enable source ECR event bridge rule"
+  type        = bool
+  default     = false
 }

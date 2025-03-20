@@ -3,7 +3,7 @@ locals {
 }
 
 data "aws_kms_secrets" "this" {
-  for_each = var.enabled ? var.kms_secrets : {}
+  for_each = var.enabled && !var.enable_source_ecr_event_bridge_rule ? var.kms_secrets : {}
   secret {
     name    = each.key
     payload = each.value
@@ -11,7 +11,7 @@ data "aws_kms_secrets" "this" {
 }
 
 resource "aws_ssm_parameter" "this" {
-  for_each    = var.enabled ? data.aws_kms_secrets.this : {}
+  for_each    = var.enabled && !var.enable_source_ecr_event_bridge_rule ? data.aws_kms_secrets.this : {}
   description = "Do not modify. Managed by Terraform from terraform-aws-app"
   name        = "${local.ssm_prefix}${each.key}"
   type        = "SecureString"
@@ -21,7 +21,7 @@ resource "aws_ssm_parameter" "this" {
 }
 
 resource "aws_ssm_parameter" "dns" {
-  count       = var.enable_route53 && var.enabled ? 1 : 0
+  count       = var.enable_route53 && var.enabled && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
   name        = "/${var.git}/dns/${aws_route53_record.this[0].name}"
   description = "gathering route53 info"
   type        = "SecureString"

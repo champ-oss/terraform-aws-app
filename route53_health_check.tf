@@ -8,7 +8,7 @@ locals {
 }
 
 resource "aws_route53_health_check" "this" {
-  count             = var.enabled && var.enable_route53_health_check && local.autoscaling_min_capacity != 0 ? 1 : 0
+  count             = var.enabled && var.enable_route53_health_check && local.autoscaling_min_capacity && !var.enable_source_ecr_event_bridge_rule != 0 ? 1 : 0
   fqdn              = try(aws_route53_record.this[0].name, "fallback")
   port              = var.health_check_port
   type              = var.health_check_type

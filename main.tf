@@ -15,13 +15,13 @@ locals {
 }
 
 resource "random_password" "healthcheck" {
-  count   = var.enable_public_healthcheck_rule && var.enabled ? 1 : 0
+  count   = var.enable_public_healthcheck_rule && var.enabled && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
   length  = 32
   special = false
 }
 
 resource "null_resource" "wait_for_ecr" {
-  count = var.enable_wait_for_ecr && var.enabled && !var.enable_ecs_auto_update ? 1 : 0
+  count = var.enable_wait_for_ecr && var.enabled && !var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
   triggers = {
     image = var.image
   }
