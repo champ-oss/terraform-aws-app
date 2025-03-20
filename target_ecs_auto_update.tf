@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "allow_ecr_account_access" {
       "events:PutEvents",
     ]
     resources = [
-      "arn:aws:events:${data.aws_region.this[0].name}:${var.source_ecr_account}event-bus/default"
+      "arn:aws:events:us-east-2:${var.source_ecr_account}event-bus/default"
     ]
 
     principals {
