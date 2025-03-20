@@ -4,22 +4,29 @@ resource "aws_cloudwatch_event_bus" "cross_account_bus" {
   tags  = merge(local.tags, var.tags)
 }
 
-resource "aws_cloudwatch_event_bus_policy" "allow_target_account" {
-  event_bus_name = aws_cloudwatch_event_bus.cross_account_bus[0].name
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        sid    = "AllowCrossAccount",
-        Effect = "Allow",
-        Principal = {
-          "AWS" : "arn:aws:iam::${var.source_ecr_account}:root"
-        },
-        Action   = "events:PutEvents",
-        Resource = aws_cloudwatch_event_bus.cross_account_bus[0].arn
-      }
+data "aws_iam_policy_document" "cross_account_event_policy" {
+  count = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
+  statement {
+    sid    = "ecraccountaccess"
+    effect = "Allow"
+    actions = [
+      "events:PutEvents",
     ]
-  })
+    resources = [
+      "arn:aws:events:${data.aws_region.this[0].name}:${var.source_ecr_account}event-bus/default"
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = [var.source_ecr_account]
+    }
+  }
+}
+
+resource "aws_cloudwatch_event_bus_policy" "cross_account_event_policy" {
+  count = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
+  policy         = data.aws_iam_policy_document.cross_account_event_policy[0].json
+  event_bus_name = aws_cloudwatch_event_bus.cross_account_bus[0].name
 }
 
 resource "aws_cloudwatch_event_rule" "trigger_step_function" {
