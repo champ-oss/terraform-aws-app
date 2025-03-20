@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "allow_ecr_account_access" {
       "events:PutEvents",
     ]
     resources = [
-      "arn:aws:events:us-east-2:${var.source_ecr_account}event-bus/default"
+      "arn:aws:events:${data.aws_region.this[0].name}:${var.source_ecr_account}:event-bus/default"
     ]
 
     principals {
@@ -24,7 +24,7 @@ data "aws_iam_policy_document" "allow_ecr_account_access" {
 }
 
 resource "aws_cloudwatch_event_bus_policy" "allow_ecr_account_access" {
-  count = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
+  count          = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
   policy         = data.aws_iam_policy_document.allow_ecr_account_access[0].json
   event_bus_name = aws_cloudwatch_event_bus.cross_account_bus[0].name
 }
