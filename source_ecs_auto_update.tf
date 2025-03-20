@@ -48,7 +48,7 @@ data "aws_iam_policy_document" "cross_account_event_policy" {
 # create a role to allow source account to send events to target account
 resource "aws_iam_role" "cross_account_event_role" {
   count              = var.enabled && var.enable_source_ecr_event_bridge_rule ? 1 : 0
-  name_prefix        = "${var.git}-${var.name}-cross-account-event-role"
+  name_prefix        = var.git
   assume_role_policy = data.aws_iam_policy_document.sts_event_policy[0].json
   tags               = merge(local.tags, var.tags)
 }
