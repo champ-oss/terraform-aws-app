@@ -1,12 +1,14 @@
 resource "aws_cloudwatch_event_bus" "cross_account_bus" {
   count = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
   name  = substr(var.git, 0, 64)
+  tags  = merge(local.tags, var.tags)
 }
 
 resource "aws_cloudwatch_event_rule" "trigger_step_function" {
   count          = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
   name           = "trigger-step-function"
   event_bus_name = aws_cloudwatch_event_bus.cross_account_bus[0].name
+  tags           = merge(local.tags, var.tags)
   event_pattern = jsonencode({
     source      = ["aws.ecr"],
     detail-type = ["ECR Image Action"],
@@ -23,12 +25,14 @@ resource "aws_cloudwatch_event_target" "step_function_target" {
   rule     = aws_cloudwatch_event_rule.trigger_step_function[0].name
   arn      = aws_sfn_state_machine.this[0].arn
   role_arn = aws_iam_role.eventbridge_role[0].arn
+  tags     = merge(local.tags, var.tags)
 }
 
 # IAM Role for Step Functions
 resource "aws_iam_role" "step_functions_role" {
   count       = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
   name_prefix = var.git
+  tags        = merge(local.tags, var.tags)
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -56,6 +60,7 @@ resource "aws_iam_policy_attachment" "ecs_update_policy" {
 resource "aws_iam_role" "eventbridge_role" {
   count       = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
   name_prefix = substr("${var.git}-${var.name}-eventbridge-role", 0, 38)
+  tags        = merge(local.tags, var.tags)
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -98,6 +103,7 @@ resource "aws_iam_policy_attachment" "invoke_step_functions_attachment" {
 resource "aws_sfn_state_machine" "this" {
   count = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
   name  = substr("${var.git}-${var.name}", 0, 64)
+  tags  = merge(local.tags, var.tags)
   definition = jsonencode({
     "Comment" : "State machine to update ECS service on new ECR image push",
     "StartAt" : "UpdateECSService",
