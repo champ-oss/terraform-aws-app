@@ -4,7 +4,7 @@ resource "aws_cloudwatch_event_bus" "cross_account_bus" {
   tags  = merge(local.tags, var.tags)
 }
 
-data "aws_iam_policy_document" "cross_account_event_policy" {
+data "aws_iam_policy_document" "allow_ecr_account_access" {
   count = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
   statement {
     sid    = "ecraccountaccess"
@@ -23,9 +23,9 @@ data "aws_iam_policy_document" "cross_account_event_policy" {
   }
 }
 
-resource "aws_cloudwatch_event_bus_policy" "cross_account_event_policy" {
+resource "aws_cloudwatch_event_bus_policy" "allow_ecr_account_access" {
   count = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
-  policy         = data.aws_iam_policy_document.cross_account_event_policy[0].json
+  policy         = data.aws_iam_policy_document.allow_ecr_account_access[0].json
   event_bus_name = aws_cloudwatch_event_bus.cross_account_bus[0].name
 }
 
