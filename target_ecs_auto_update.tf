@@ -4,6 +4,23 @@ resource "aws_cloudwatch_event_bus" "cross_account_bus" {
   tags  = merge(local.tags, var.tags)
 }
 
+resource "aws_cloudwatch_event_bus_policy" "allow_target_account" {
+  event_bus_name = aws_cloudwatch_event_bus.cross_account_bus[0].name
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          "AWS" : "arn:aws:iam::${var.source_ecr_account}:root"
+        },
+        Action   = "events:PutEvents",
+        Resource = aws_cloudwatch_event_bus.cross_account_bus.arn
+      }
+    ]
+  })
+}
+
 resource "aws_cloudwatch_event_rule" "trigger_step_function" {
   count          = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
   name           = "trigger-step-function"
@@ -14,8 +31,8 @@ resource "aws_cloudwatch_event_rule" "trigger_step_function" {
     detail-type = ["ECR Image Action"],
     detail = {
       "action-type" : ["PUSH"],
-      "repository-name" : ["develop"],
-      "image-tag" : ["latest"]
+      "repository-name" = [var.ecr_repository_name],
+      "image-tag"       = [var.ecr_image_tag]
     }
   })
 }
@@ -129,3 +146,5 @@ resource "aws_sfn_state_machine" "this" {
   })
   role_arn = aws_iam_role.step_functions_role[0].arn
 }
+
+

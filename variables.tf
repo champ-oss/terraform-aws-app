@@ -537,3 +537,9 @@ variable "target_aws_cloudwatch_event_bus_arns" {
   type        = list(string)
   default     = []
 }
+
+variable "source_ecr_account" {
+  description = "Source ECR account"
+  type        = string
+  default     = ""
+}
