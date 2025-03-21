@@ -10,7 +10,7 @@ locals {
   container = [
     {
       name        = "this"
-      image       = var.enable_ecs_auto_update ? "${var.source_ecr_account}.dkr.ecr.us-east-2.amazonaws.com/${var.ecr_repository_name}:${var.ecr_image_tag}" : var.image
+      image       = var.image
       essential   = true
       environment = [for key, value in merge(var.environment, local.kms_secrets_sha) : { name = key, value = value }]
       secrets     = [for key, value in merge(var.secrets, local.kms_ssm) : { name = key, valueFrom = value }]

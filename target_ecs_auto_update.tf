@@ -1,8 +1,6 @@
-resource "aws_cloudwatch_event_bus" "cross_account_bus" {
-  count = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
-  name  = substr(var.git, 0, 64)
-  tags  = merge(local.tags, var.tags)
-}
+# use terraform funcion split to prune account and version
+
+
 
 # custom event bus policy to allow source account to send events to target account
 data "aws_iam_policy_document" "allow_ecr_account_access" {
@@ -14,7 +12,7 @@ data "aws_iam_policy_document" "allow_ecr_account_access" {
       "events:PutEvents",
     ]
     resources = [
-      "arn:aws:events:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:event-bus/${aws_cloudwatch_event_bus.cross_account_bus[0].name}"
+      "arn:aws:events:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:event-bus/default"
     ]
 
     principals {
@@ -27,13 +25,14 @@ data "aws_iam_policy_document" "allow_ecr_account_access" {
 resource "aws_cloudwatch_event_bus_policy" "allow_ecr_account_access" {
   count          = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
   policy         = data.aws_iam_policy_document.allow_ecr_account_access[0].json
-  event_bus_name = aws_cloudwatch_event_bus.cross_account_bus[0].name
+  event_bus_name = "default"
 }
 
 resource "aws_cloudwatch_event_rule" "trigger_step_function" {
   count          = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
-  name           = "trigger-step-function"
-  event_bus_name = aws_cloudwatch_event_bus.cross_account_bus[0].name
+  name_prefix =   var.git
+  description    = "Rule to trigger Step Function"
+  event_bus_name = "default"
   tags           = merge(local.tags, var.tags)
   event_pattern = jsonencode({
     source      = ["aws.ecr"],
@@ -51,7 +50,7 @@ resource "aws_cloudwatch_event_target" "step_function_target" {
   rule           = aws_cloudwatch_event_rule.trigger_step_function[0].name
   arn            = aws_sfn_state_machine.this[0].arn
   role_arn       = aws_iam_role.eventbridge_role[0].arn
-  event_bus_name = aws_cloudwatch_event_bus.cross_account_bus[0].name
+  event_bus_name = "default"
 }
 
 # IAM Role for Step Functions

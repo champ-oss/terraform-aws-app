@@ -11,8 +11,6 @@ resource "aws_cloudwatch_event_rule" "ecr_image_push_rule" {
     detail-type = ["ECR Image Action"],
     detail = {
       "action-type"     = ["PUSH"],
-      "repository-name" = [var.ecr_repository_name],
-      "image-tag"       = [var.ecr_image_tag],
       "result" : ["SUCCESS"]
     }
   })
