@@ -9,7 +9,6 @@ resource "aws_cloudwatch_event_rule" "ecr_image_push_rule" {
   event_pattern = jsonencode({
     source      = ["aws.ecr"],
     detail-type = ["ECR Image Action"],
-    event_bus_name = "default",
     detail = {
       "action-type" = ["PUSH"],
       "repository-name" = [var.ecr_repository_name],
