@@ -514,18 +514,6 @@ variable "enable_ecs_auto_update" {
   default     = false
 }
 
-variable "ecr_repository_name" {
-  description = "ECR repository name"
-  type        = string
-  default     = ""
-}
-
-variable "ecr_image_tag" {
-  description = "ECR image tag"
-  type        = string
-  default     = "develop-latest"
-}
-
 variable "enable_source_ecr_event_bridge_rule" {
   description = "Enable source ECR event bridge rule"
   type        = bool
@@ -536,10 +524,4 @@ variable "target_aws_cloudwatch_event_bus_arns" {
   description = "List of target AWS CloudWatch Event Bus ARNs"
   type        = list(string)
   default     = []
-}
-
-variable "source_ecr_account" {
-  description = "Source ECR account"
-  type        = string
-  default     = ""
 }
