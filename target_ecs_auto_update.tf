@@ -36,7 +36,7 @@ resource "aws_cloudwatch_event_rule" "trigger_step_function" {
     detail-type = ["ECR Image Action"],
     detail = {
       "action-type" : ["PUSH"],
-      "repository-name" = [split(":", split("/", split(".", var.image)[0])[1])[0]],
+      "repository-name" = [split(":", split("/", var.image)[1])[0]],
       "image-tag"       = [split(":", split("/", var.image)[1])[1]],
     }
   })
