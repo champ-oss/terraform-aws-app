@@ -178,6 +178,7 @@ module "with_ecs_auto_update" {
   enable_route53                    = true
   enable_wait_for_ecr               = true
   enable_ecs_auto_update            = true
+  source_event_bus_name             = aws_cloudwatch_event_bus.this.name
   name                              = "with_ecs"
   dns_name                          = "${local.git}.${data.aws_route53_zone.this.name}"
   image                             = "912455136424.dkr.ecr.us-east-2.amazonaws.com/terraform-aws-app:latest"
