@@ -22,7 +22,7 @@ data "aws_iam_policy_document" "allow_ecr_account_access" {
 }
 
 resource "aws_cloudwatch_event_bus_policy" "allow_ecr_account_access" {
-  count          = var.enabled && var.enable_ecs_auto_update ? 1 : 0
+  count          = var.enabled && var.enable_ecs_auto_update && ? 1 : 0
   policy         = data.aws_iam_policy_document.allow_ecr_account_access[0].json
   event_bus_name = "default"
 }
