@@ -50,7 +50,7 @@ resource "aws_cloudwatch_event_target" "send_to_target_accounts" {
   rule           = aws_cloudwatch_event_rule.ecr_image_push_rule.name
   role_arn       = aws_iam_role.cross_account_event_role.arn
   event_bus_name = aws_cloudwatch_event_bus.this.name
-  arn            = "arn:aws:events:us-east-2:${data.aws_caller_identity.this[0].account_id}:event-bus/default"
+  arn            = "arn:aws:events:us-east-2:${data.aws_caller_identity.this.account_id}:event-bus/default"
 }
 
 data "aws_iam_policy_document" "sts_event_policy" {
