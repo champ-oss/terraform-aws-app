@@ -116,7 +116,7 @@ variable "name" {
 variable "image" {
   description = "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#container_definition_image"
   type        = string
-  default     = "develop-latest"
+  default     = "168013575370.dkr.ecr.us-east-2.amazonaws.com/terraform-testing:develop-latest"
 }
 
 variable "cpu" {

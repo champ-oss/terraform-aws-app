@@ -1,5 +1,6 @@
 # use terraform funcion split to prune account and version
 # custom event bus policy to allow source account to send events to target account
+
 data "aws_iam_policy_document" "allow_ecr_account_access" {
   count = var.enabled && var.enable_ecs_auto_update && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
   statement {
@@ -36,7 +37,7 @@ resource "aws_cloudwatch_event_rule" "trigger_step_function" {
     detail-type = ["ECR Image Action"],
     detail = {
       "action-type" : ["PUSH"],
-      "repository-name" = [split(":", split("/", var.image)[1])[0]],
+      "repository-name" = join("/", slice(split("/", split(":", var.image)[0]), 1, length(split("/", split(":", var.image)[0]))))
       "image-tag"       = [split(":", split("/", var.image)[1])[1]],
     }
   })
