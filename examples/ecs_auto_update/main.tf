@@ -73,7 +73,7 @@ resource "aws_iam_role" "cross_account_event_role" {
 }
 
 resource "aws_iam_role_policy" "cross_account_event_policy" {
-  name   = "${var.git}-${var.name}-cross-account-event-policy"
+  name   = "${local.git}-cross-account-event-policy"
   role   = aws_iam_role.cross_account_event_role.name
   policy = data.aws_iam_policy_document.cross_account_event_policy.json
 }
