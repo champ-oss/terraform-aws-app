@@ -25,8 +25,6 @@ provider "aws" {
   region = "us-east-2"
 }
 
-data "aws_caller_identity" "this" {}
-
 resource "aws_cloudwatch_event_rule" "ecr_image_push_rule" {
   name_prefix = "${local.git}-source"
   description = "Rule to trigger ECS Auto Update"
@@ -49,7 +47,7 @@ resource "aws_cloudwatch_event_bus" "this" {
 resource "aws_cloudwatch_event_target" "send_to_target_accounts" {
   rule           = aws_cloudwatch_event_rule.ecr_image_push_rule.name
   role_arn       = aws_iam_role.cross_account_event_role.arn
-  arn            = "default" # set as arn if you have the arn of the target account
+  event_bus_name = aws_cloudwatch_event_bus.this.name
 }
 
 data "aws_iam_policy_document" "sts_event_policy" {
