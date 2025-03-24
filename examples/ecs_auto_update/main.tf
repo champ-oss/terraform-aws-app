@@ -28,9 +28,8 @@ provider "aws" {
 data "aws_caller_identity" "this" {}
 
 resource "aws_cloudwatch_event_rule" "ecr_image_push_rule" {
-  name_prefix = var.git
+  name_prefix = local.git
   description = "Rule to trigger ECS Auto Update"
-  tags        = merge(local.tags, var.tags)
   event_pattern = jsonencode({
     source      = ["aws.ecr"],
     detail-type = ["ECR Image Action"],
@@ -69,7 +68,7 @@ data "aws_iam_policy_document" "cross_account_event_policy" {
 
 # create a role to allow source account to send events to target account
 resource "aws_iam_role" "cross_account_event_role" {
-  name_prefix        = var.git
+  name_prefix        = local.git
   assume_role_policy = data.aws_iam_policy_document.sts_event_policy.json
   tags               = merge(local.tags, var.tags)
 }
