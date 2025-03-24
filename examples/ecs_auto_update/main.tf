@@ -40,9 +40,13 @@ resource "aws_cloudwatch_event_rule" "ecr_image_push_rule" {
   })
 }
 
+resource "aws_cloudwatch_event_bus" "this" {
+  name = "ecr_image_push"
+}
+
 # event bridge target to send events to aws_cloudwatch_event_bus in target account
 resource "aws_cloudwatch_event_target" "send_to_target_accounts" {
-  event_bus_name = "ecr_image_push_rule"
+  event_bus_name = aws_cloudwatch_event_bus.this.name
   rule     = aws_cloudwatch_event_rule.ecr_image_push_rule.name
   role_arn = aws_iam_role.cross_account_event_role.arn
   arn      = "arn:aws:events:us-east-2:${data.aws_caller_identity.this.account_id}:event-bus/default"
