@@ -69,10 +69,14 @@ variable "enabled" {
   default     = true
 }
 
-module "hash" {
-  source   = "github.com/champ-oss/terraform-git-hash.git?ref=v1.0.12-fc3bb87"
-  path     = "${path.module}/../.."
-  fallback = ""
+resource "aws_cloudwatch_event_rule" "rule_on_custom_bus" {
+  name        = "my-rule"
+  description = "Capture events on custom event bus"
+  event_pattern = jsonencode({
+    source = ["aws.ecr"],
+    detail-type = ["ECR Image Action"]
+
+  })
 }
 
 module "acm" {
@@ -125,7 +129,8 @@ module "with_lb" {
   enable_wait_for_ecr               = true
   name                              = "with_lb"
   dns_name                          = "${local.git}.${data.aws_route53_zone.this.name}"
-  image                             = "912455136424.dkr.ecr.us-east-2.amazonaws.com/terraform-aws-app:${module.hash.hash}"
+  image                             = "912455136424.dkr.ecr.us-east-2.amazonaws.com/terraform-aws-app:latest"
+  enable_ecs_auto_update            = true
   healthcheck                       = "/ping"
   port                              = 8080
   health_check_grace_period_seconds = 5
