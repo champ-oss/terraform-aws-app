@@ -113,9 +113,9 @@ module "kms" {
   enabled                 = var.enabled
 }
 
-module "with_lb" {
+module "wait_ecr" {
   source                            = "../../"
-  git                               = "${local.git}a"
+  git                               = local.git
   vpc_id                            = data.aws_vpcs.this.ids[0]
   subnets                           = data.aws_subnets.private.ids
   zone_id                           = data.aws_route53_zone.this.zone_id
@@ -131,28 +131,6 @@ module "with_lb" {
   dns_name                          = "${local.git}.${data.aws_route53_zone.this.name}"
   image                             = "912455136424.dkr.ecr.us-east-2.amazonaws.com/terraform-aws-app:latest"
   enable_ecs_auto_update            = true
-  healthcheck                       = "/ping"
-  port                              = 8080
-  health_check_grace_period_seconds = 5
-  deregistration_delay              = 5
-  enabled                           = var.enabled
-}
-
-module "without_lb" {
-  source                            = "../../"
-  git                               = "${local.git}b"
-  vpc_id                            = data.aws_vpcs.this.ids[0]
-  subnets                           = data.aws_subnets.private.ids
-  zone_id                           = data.aws_route53_zone.this.zone_id
-  cluster                           = module.core.ecs_cluster_name
-  security_groups                   = [module.core.ecs_app_security_group]
-  execution_role_arn                = module.core.execution_ecs_role_arn
-  enable_load_balancer              = false
-  enable_route53                    = false
-  enable_route53_health_check       = false
-  enable_wait_for_ecr               = true
-  name                              = "without_lb"
-  image                             = "912455136424.dkr.ecr.us-east-2.amazonaws.com/terraform-aws-app:${module.hash.hash}"
   healthcheck                       = "/ping"
   port                              = 8080
   health_check_grace_period_seconds = 5
