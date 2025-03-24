@@ -187,6 +187,7 @@ module "with_ecs_auto_update" {
   health_check_grace_period_seconds = 5
   deregistration_delay              = 5
   enabled                           = var.enabled
+  depends_on = [aws_cloudwatch_event_bus.this]
 }
 
 
