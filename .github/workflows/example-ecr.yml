@@ -26,3 +26,7 @@ jobs:
         run: aws ecr create-repository --region us-east-2 --repository-name terraform-aws-app || echo "repo already exists"
       - name: docker push
         run: docker push ${REPO}:${GITHUB_SHA}
+      - name: docker tag
+        run: docker tag ${REPO}:${GITHUB_SHA} ${REPO}:latest
+      - name: docker push latest
+        run: docker push ${REPO}:latest
