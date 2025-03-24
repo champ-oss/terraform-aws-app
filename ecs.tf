@@ -35,7 +35,7 @@ locals {
 }
 
 resource "aws_ecs_task_definition" "this" {
-  count                    = var.enabled && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
+  count                    = var.enabled ? 1 : 0
   family                   = "${var.git}-${var.name}"
   container_definitions    = try(jsonencode(local.container), "")
   execution_role_arn       = var.execution_role_arn
@@ -48,7 +48,7 @@ resource "aws_ecs_task_definition" "this" {
 }
 
 resource "aws_ecs_service" "this" {
-  count                              = var.enable_load_balancer && var.enabled && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
+  count                              = var.enable_load_balancer && var.enabled ? 1 : 0
   name                               = var.name
   cluster                            = var.cluster
   task_definition                    = aws_ecs_task_definition.this[0].arn
@@ -85,7 +85,7 @@ resource "aws_ecs_service" "this" {
 
 resource "aws_ecs_service" "disabled_load_balancer" {
   depends_on                         = [null_resource.wait_for_ecr]
-  count                              = var.enable_load_balancer == false && var.enabled && !var.enable_source_ecr_event_bridge_rule ? 1 : 0
+  count                              = var.enable_load_balancer == false && var.enabled ? 1 : 0
   name                               = var.name
   cluster                            = var.cluster
   task_definition                    = aws_ecs_task_definition.this[0].arn
