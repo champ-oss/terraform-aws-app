@@ -70,7 +70,6 @@ data "aws_iam_policy_document" "cross_account_event_policy" {
 resource "aws_iam_role" "cross_account_event_role" {
   name_prefix        = local.git
   assume_role_policy = data.aws_iam_policy_document.sts_event_policy.json
-  tags               = merge(local.tags, var.tags)
 }
 
 resource "aws_iam_role_policy" "cross_account_event_policy" {
