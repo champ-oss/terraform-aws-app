@@ -506,3 +506,9 @@ variable "sns_topic_arn" {
   type        = string
   default     = ""
 }
+
+variable "enable_ecs_auto_update" {
+  description = "Enable ECS auto update"
+  type        = bool
+  default     = false
+}
