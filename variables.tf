@@ -513,9 +513,3 @@ variable "enable_ecs_auto_update" {
   type        = bool
   default     = false
 }
-
-variable "target_aws_cloudwatch_event_bus_arns" {
-  description = "List of target AWS CloudWatch Event Bus ARNs"
-  type        = list(string)
-  default     = []
-}
