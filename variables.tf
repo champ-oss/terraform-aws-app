@@ -516,5 +516,4 @@ variable "enable_ecs_auto_update" {
 variable "source_event_bus_name" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_event_bus#name"
   type        = string
-  default     = "default"
 }

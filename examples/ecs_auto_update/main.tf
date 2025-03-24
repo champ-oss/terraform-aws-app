@@ -45,12 +45,10 @@ resource "aws_cloudwatch_event_bus" "this" {
   name = "ecr_image_push"
 }
 
-# event bridge target to send events to aws_cloudwatch_event_bus in target account
 resource "aws_cloudwatch_event_target" "send_to_target_accounts" {
-  rule           = aws_cloudwatch_event_rule.ecr_image_push_rule.name
-  role_arn       = aws_iam_role.cross_account_event_role.arn
-  event_bus_name = aws_cloudwatch_event_bus.this.name
-  arn            = "arn:aws:events:us-east-2:${data.aws_caller_identity.this.account_id}:event-bus/default"
+  rule     = aws_cloudwatch_event_rule.ecr_image_push_rule.name
+  role_arn = aws_iam_role.cross_account_event_role.arn
+  arn      = "arn:aws:events:us-east-2:912455136424:event-bus/default"
 }
 
 data "aws_iam_policy_document" "sts_event_policy" {
@@ -72,17 +70,12 @@ data "aws_iam_policy_document" "cross_account_event_policy" {
   }
 }
 
-# create a role to allow source account to send events to target account
 resource "aws_iam_role" "cross_account_event_role" {
-  name_prefix        = local.git
+  name_prefix        = "${local.git}-source"
   assume_role_policy = data.aws_iam_policy_document.sts_event_policy.json
+  tags               = local.tags
 }
 
-resource "aws_iam_role_policy" "cross_account_event_policy" {
-  name   = "${local.git}-cross-account-event-policy"
-  role   = aws_iam_role.cross_account_event_role.name
-  policy = data.aws_iam_policy_document.cross_account_event_policy.json
-}
 
 data "aws_vpcs" "this" {
   tags = {
@@ -178,7 +171,7 @@ module "with_ecs_auto_update" {
   enable_route53                    = true
   enable_wait_for_ecr               = true
   enable_ecs_auto_update            = true
-  source_event_bus_name             = aws_cloudwatch_event_bus.this.name
+  source_event_bus_name             = "ecr_image_push"
   name                              = "with_ecs"
   dns_name                          = "${local.git}.${data.aws_route53_zone.this.name}"
   image                             = "912455136424.dkr.ecr.us-east-2.amazonaws.com/terraform-aws-app:latest"

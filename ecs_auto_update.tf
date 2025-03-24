@@ -1,36 +1,3 @@
-data "aws_caller_identity" "this" {
-  count = var.enabled && var.enable_ecs_auto_update ? 1 : 0
-}
-
-locals {
-  get_account_id = split(".", var.image)[0]
-}
-
-data "aws_iam_policy_document" "allow_ecr_account_access" {
-  count = var.enabled && var.enable_ecs_auto_update ? 1 : 0
-  statement {
-    sid    = "ecraccountaccess"
-    effect = "Allow"
-    actions = [
-      "events:PutEvents",
-    ]
-    resources = [
-      "arn:aws:events:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:event-bus/${var.source_event_bus_name}",
-    ]
-
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.get_account_id}:root"]
-    }
-  }
-}
-
-resource "aws_cloudwatch_event_bus_policy" "allow_ecr_account_access" {
-  count          = var.enabled && var.enable_ecs_auto_update ? 1 : 0
-  policy         = data.aws_iam_policy_document.allow_ecr_account_access[0].json
-  event_bus_name = "default"
-}
-
 resource "aws_cloudwatch_event_rule" "trigger_step_function" {
   count          = var.enabled && var.enable_ecs_auto_update ? 1 : 0
   name_prefix    = var.git
