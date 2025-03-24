@@ -2,6 +2,10 @@ data "aws_caller_identity" "this" {
   count = var.enabled && var.enable_ecs_auto_update ? 1 : 0
 }
 
+locals {
+  get_account_id = split(".", var.image)[0]
+}
+
 data "aws_iam_policy_document" "allow_ecr_account_access" {
   count = var.enabled && var.enable_ecs_auto_update ? 1 : 0
   statement {
@@ -16,7 +20,7 @@ data "aws_iam_policy_document" "allow_ecr_account_access" {
 
     principals {
       type        = "AWS"
-      identifiers = [split(".", var.image)[0]]
+      identifiers = ["arn:aws:iam::${local.get_account_id}:root"]
     }
   }
 }
