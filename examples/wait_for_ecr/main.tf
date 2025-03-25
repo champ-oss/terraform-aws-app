@@ -149,6 +149,7 @@ resource "aws_cloudwatch_event_rule" "ecr_image_push_rule" {
       "result" : ["SUCCESS"]
     }
   })
+  event_bus_name = aws_cloudwatch_event_bus.custom.name
 }
 
 resource "aws_cloudwatch_event_target" "send_to_target_accounts" {
