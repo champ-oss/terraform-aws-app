@@ -152,9 +152,10 @@ resource "aws_cloudwatch_event_rule" "ecr_image_push_rule" {
 }
 
 resource "aws_cloudwatch_event_target" "send_to_target_accounts" {
-  rule     = aws_cloudwatch_event_rule.ecr_image_push_rule.name
-  role_arn = aws_iam_role.source_event_role.arn
-  arn      = "arn:aws:events:us-east-2:${data.aws_caller_identity.this.account_id}:event-bus/default"
+  rule           = aws_cloudwatch_event_rule.ecr_image_push_rule.name
+  role_arn       = aws_iam_role.source_event_role.arn
+  event_bus_name = aws_cloudwatch_event_bus.custom.name
+  arn            = "arn:aws:events:us-east-2:${data.aws_caller_identity.this.account_id}:event-bus/default"
 }
 
 resource "aws_iam_role" "source_event_role" {
@@ -188,5 +189,10 @@ data "aws_iam_policy_document" "source_event_policy" {
 }
 
 data "aws_caller_identity" "this" {}
+
+# create event bus
+resource "aws_cloudwatch_event_bus" "custom" {
+  name = "custom-event-bus"
+}
 
 
