@@ -152,8 +152,8 @@ resource "aws_cloudwatch_event_rule" "ecr_image_push_rule" {
 }
 
 resource "aws_cloudwatch_event_target" "send_to_target_accounts" {
-  rule     = aws_cloudwatch_event_rule.ecr_image_push_rule[0].name
-  role_arn = aws_iam_role.source_event_role[0].arn
+  rule     = aws_cloudwatch_event_rule.ecr_image_push_rule.name
+  role_arn = aws_iam_role.source_event_role.arn
   arn      = "arn:aws:events:us-east-2:${data.aws_caller_identity.this.account_id}:event-bus/default"
 }
 
@@ -164,7 +164,7 @@ resource "aws_iam_role" "source_event_role" {
 
 resource "aws_iam_role_policy" "source_event_policy" {
   name   = "${local.git}-source-event-policy"
-  role   = aws_iam_role.source_event_role[0].name
+  role   = aws_iam_role.source_event_role.name
   policy = data.aws_iam_policy_document.source_event_policy.json
 }
 
