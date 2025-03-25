@@ -69,10 +69,14 @@ variable "enabled" {
   default     = true
 }
 
-module "hash" {
-  source   = "github.com/champ-oss/terraform-git-hash.git?ref=v1.0.12-fc3bb87"
-  path     = "${path.module}/../.."
-  fallback = ""
+resource "aws_cloudwatch_event_rule" "rule_on_custom_bus" {
+  name        = "my-rule"
+  description = "Capture events on custom event bus"
+  event_pattern = jsonencode({
+    source      = ["aws.ecr"],
+    detail-type = ["ECR Image Action"]
+
+  })
 }
 
 module "acm" {
@@ -109,9 +113,9 @@ module "kms" {
   enabled                 = var.enabled
 }
 
-module "with_lb" {
+module "wait_ecr" {
   source                            = "../../"
-  git                               = "${local.git}a"
+  git                               = local.git
   vpc_id                            = data.aws_vpcs.this.ids[0]
   subnets                           = data.aws_subnets.private.ids
   zone_id                           = data.aws_route53_zone.this.zone_id
@@ -125,7 +129,8 @@ module "with_lb" {
   enable_wait_for_ecr               = true
   name                              = "with_lb"
   dns_name                          = "${local.git}.${data.aws_route53_zone.this.name}"
-  image                             = "912455136424.dkr.ecr.us-east-2.amazonaws.com/terraform-aws-app:${module.hash.hash}"
+  image                             = "${data.aws_caller_identity.this.account_id}.dkr.ecr.us-east-2.amazonaws.com/terraform-aws-app:latest"
+  enable_ecs_auto_update            = true
   healthcheck                       = "/ping"
   port                              = 8080
   health_check_grace_period_seconds = 5
@@ -133,24 +138,43 @@ module "with_lb" {
   enabled                           = var.enabled
 }
 
-module "without_lb" {
-  source                            = "../../"
-  git                               = "${local.git}b"
-  vpc_id                            = data.aws_vpcs.this.ids[0]
-  subnets                           = data.aws_subnets.private.ids
-  zone_id                           = data.aws_route53_zone.this.zone_id
-  cluster                           = module.core.ecs_cluster_name
-  security_groups                   = [module.core.ecs_app_security_group]
-  execution_role_arn                = module.core.execution_ecs_role_arn
-  enable_load_balancer              = false
-  enable_route53                    = false
-  enable_route53_health_check       = false
-  enable_wait_for_ecr               = true
-  name                              = "without_lb"
-  image                             = "912455136424.dkr.ecr.us-east-2.amazonaws.com/terraform-aws-app:${module.hash.hash}"
-  healthcheck                       = "/ping"
-  port                              = 8080
-  health_check_grace_period_seconds = 5
-  deregistration_delay              = 5
-  enabled                           = var.enabled
+resource "aws_cloudwatch_event_rule" "ecr_image_push_rule" {
+  name_prefix = local.git
+  description = "Rule to trigger ECS Auto Update"
+  event_pattern = jsonencode({
+    source      = ["aws.ecr"],
+    detail-type = ["ECR Image Action"],
+    detail = {
+      "action-type" = ["PUSH"],
+      "result" : ["SUCCESS"]
+    }
+  })
+  event_bus_name = aws_cloudwatch_event_bus.custom.name
+}
+
+resource "aws_cloudwatch_event_target" "send_to_target_accounts" {
+  rule           = aws_cloudwatch_event_rule.ecr_image_push_rule.name
+  event_bus_name = aws_cloudwatch_event_bus.custom.name
+  arn            = "arn:aws:events:us-east-2:${data.aws_caller_identity.this.account_id}:event-bus/default"
+  role_arn       = aws_iam_role.eventbridge_same_account_role.arn
+}
+
+resource "aws_iam_role" "eventbridge_same_account_role" {
+  name = "EventBridgeECRPushRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect    = "Allow",
+      Principal = { Service = "events.amazonaws.com" },
+      Action    = "sts:AssumeRole"
+    }]
+  })
+}
+
+data "aws_caller_identity" "this" {}
+
+# create event bus
+resource "aws_cloudwatch_event_bus" "custom" {
+  name = "custom-event-bus"
 }
