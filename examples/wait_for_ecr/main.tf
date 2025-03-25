@@ -73,7 +73,7 @@ resource "aws_cloudwatch_event_rule" "rule_on_custom_bus" {
   name        = "my-rule"
   description = "Capture events on custom event bus"
   event_pattern = jsonencode({
-    source = ["aws.ecr"],
+    source      = ["aws.ecr"],
     detail-type = ["ECR Image Action"]
 
   })
@@ -129,7 +129,7 @@ module "wait_ecr" {
   enable_wait_for_ecr               = true
   name                              = "with_lb"
   dns_name                          = "${local.git}.${data.aws_route53_zone.this.name}"
-  image                             = "912455136424.dkr.ecr.us-east-2.amazonaws.com/terraform-aws-app:latest"
+  image                             = "${data.aws_caller_identity.this.account_id}.dkr.ecr.us-east-2.amazonaws.com/terraform-aws-app:latest"
   enable_ecs_auto_update            = true
   healthcheck                       = "/ping"
   port                              = 8080
@@ -137,3 +137,56 @@ module "wait_ecr" {
   deregistration_delay              = 5
   enabled                           = var.enabled
 }
+
+resource "aws_cloudwatch_event_rule" "ecr_image_push_rule" {
+  name_prefix = local.git
+  description = "Rule to trigger ECS Auto Update"
+  event_pattern = jsonencode({
+    source      = ["aws.ecr"],
+    detail-type = ["ECR Image Action"],
+    detail = {
+      "action-type" = ["PUSH"],
+      "result" : ["SUCCESS"]
+    }
+  })
+}
+
+resource "aws_cloudwatch_event_target" "send_to_target_accounts" {
+  rule     = aws_cloudwatch_event_rule.ecr_image_push_rule[0].name
+  role_arn = aws_iam_role.source_event_role[0].arn
+  arn      = "arn:aws:events:us-east-2:${data.aws_caller_identity.this.account_id}:event-bus/default"
+}
+
+resource "aws_iam_role" "source_event_role" {
+  name_prefix        = local.git
+  assume_role_policy = data.aws_iam_policy_document.sts_event_policy.json
+}
+
+resource "aws_iam_role_policy" "source_event_policy" {
+  name   = "${local.git}-source-event-policy"
+  role   = aws_iam_role.source_event_role[0].name
+  policy = data.aws_iam_policy_document.source_event_policy.json
+}
+
+data "aws_iam_policy_document" "sts_event_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      identifiers = ["events.amazonaws.com"]
+      type        = "Service"
+    }
+  }
+}
+
+data "aws_iam_policy_document" "source_event_policy" {
+  statement {
+    actions = [
+      "events:PutEvents"
+    ]
+    resources = ["*"]
+  }
+}
+
+data "aws_caller_identity" "this" {}
+
+
