@@ -156,6 +156,20 @@ resource "aws_cloudwatch_event_target" "send_to_target_accounts" {
   rule           = aws_cloudwatch_event_rule.ecr_image_push_rule.name
   event_bus_name = aws_cloudwatch_event_bus.custom.name
   arn            = "arn:aws:events:us-east-2:${data.aws_caller_identity.this.account_id}:event-bus/default"
+  role_arn       = aws_iam_role.eventbridge_same_account_role.arn
+}
+
+resource "aws_iam_role" "eventbridge_same_account_role" {
+  name = "EventBridgeECRPushRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect    = "Allow",
+      Principal = { Service = "events.amazonaws.com" },
+      Action    = "sts:AssumeRole"
+    }]
+  })
 }
 
 data "aws_caller_identity" "this" {}
