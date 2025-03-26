@@ -83,6 +83,11 @@ resource "aws_iam_policy" "invoke_step_functions_policy" {
         Effect   = "Allow",
         Action   = "states:StartExecution",
         Resource = aws_sfn_state_machine.this[0].arn
+      },
+      {
+        Effect   = "Allow",
+        Action   = "lambda:InvokeFunction",
+        Resource = "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}"
       }
     ]
   })
@@ -119,6 +124,28 @@ resource "aws_sfn_state_machine" "this" {
             "BackoffRate" : 2.0
           }
         ],
+        "Next" : "SendSlackNotification"
+      },
+      "SendSlackNotification" : {
+        "Type" : "Task",
+        "Resource" : "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
+        "Parameters" : {
+          "repository-name.$" : "$.detail.repository-name",
+          "image-tag.$" : "$.detail.image-tag",
+          "service-name.$" : aws_ecs_service.this[0].name
+        },
+        "End" : true,
+        "Catch" : [
+          {
+            "ErrorEquals" : ["Lambda.Unknown", "Lambda.ServiceException", "Lambda.ResourceNotFoundException"],
+            "ResultPath" : "$.error",
+            "Next" : "HandleError"
+          }
+        ]
+      },
+      "HandleError" : {
+        "Type" : "Pass",
+        "Result" : "Lambda function not found or failed. Continuing without Slack notification.",
         "End" : true
       }
     }

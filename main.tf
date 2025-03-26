@@ -1,7 +1,3 @@
-data "aws_region" "this" {
-  count = var.enabled ? 1 : 0
-}
-
 locals {
   tags = {
     git       = var.git
