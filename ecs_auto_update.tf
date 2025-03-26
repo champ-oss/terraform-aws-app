@@ -21,7 +21,11 @@ resource "aws_cloudwatch_event_target" "step_function_target" {
   arn            = aws_sfn_state_machine.this[0].arn
   role_arn       = aws_iam_role.eventbridge_role[0].arn
   event_bus_name = "default"
-  input_path     = "$.detail"
+  input = jsonencode({
+    "repository-name" = "$.detail.repository-name",
+    "image-tag"       = "$.detail.image-tag",
+    "service-name"    = aws_ecs_service.this[0].name
+  })
 }
 
 # IAM Role for Step Functions
@@ -133,7 +137,7 @@ resource "aws_sfn_state_machine" "this" {
         "Parameters" : {
           "repository-name.$" : "$.repository-name",
           "image-tag.$" : "$.image-tag",
-          "service-name.$" : aws_ecs_service.this[0].name
+          "service-name": "$.service-name"
         },
         "End" : true,
         "Catch" : [
