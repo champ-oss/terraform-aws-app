@@ -21,6 +21,7 @@ resource "aws_cloudwatch_event_target" "step_function_target" {
   arn            = aws_sfn_state_machine.this[0].arn
   role_arn       = aws_iam_role.eventbridge_role[0].arn
   event_bus_name = "default"
+  input_path     = "$.detail"
 }
 
 # IAM Role for Step Functions
@@ -130,8 +131,8 @@ resource "aws_sfn_state_machine" "this" {
         "Type" : "Task",
         "Resource" : "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
         "Parameters" : {
-          "repository-name.$" : aws_cloudwatch_event_rule.trigger_step_function[0].event_pattern["detail"]["repository-name"],
-          "image-tag.$" : aws_cloudwatch_event_rule.trigger_step_function[0].event_pattern["detail"]["image-tag"],
+          "repository-name.$" : "$.repository-name",
+          "image-tag.$" : "$.image-tag",
           "service-name.$" : aws_ecs_service.this[0].name
         },
         "End" : true,
