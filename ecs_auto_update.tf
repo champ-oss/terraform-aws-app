@@ -95,7 +95,7 @@ resource "aws_iam_policy" "invoke_step_functions_policy" {
       {
         Effect   = "Allow",
         Action   = "lambda:InvokeFunction",
-        Resource = "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}"
+        Resource = "*"
       }
     ]
   })
