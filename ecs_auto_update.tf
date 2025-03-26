@@ -130,8 +130,8 @@ resource "aws_sfn_state_machine" "this" {
         "Type" : "Task",
         "Resource" : "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
         "Parameters" : {
-          "repository-name.$" : join("/", slice(split("/", split(":", var.image)[0]), 1, length(split("/", split(":", var.image)[0])))),
-          "image-tag.$" : split(":", split("/", var.image)[1])[1],
+          "repository-name.$" : aws_cloudwatch_event_rule.trigger_step_function[0].event_pattern["detail"]["repository-name"][0],
+          "image-tag.$" : aws_cloudwatch_event_rule.trigger_step_function[0].event_pattern["detail"]["image-tag"][0],
           "service-name.$" : aws_ecs_service.this[0].name
         },
         "End" : true,
