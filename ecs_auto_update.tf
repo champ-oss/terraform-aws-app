@@ -141,7 +141,9 @@ resource "aws_sfn_state_machine" "this" {
           # pass state input value from repository-name and image-tag, not output
           "repository-name.$" : "$$.Execution.Input.repository-name",
           "image-tag.$" : "$$.Execution.Input.image-tag",
-          "service-name" : aws_ecs_service.this[0].name
+          "service-name" : aws_ecs_service.this[0].name,
+          "cluster-name" : var.cluster,
+          "sha" : "$$.Execution.Input.image-digest",
         },
         "End" : true,
         "Catch" : [
