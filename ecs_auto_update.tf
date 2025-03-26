@@ -65,7 +65,14 @@ resource "aws_iam_role" "eventbridge_role" {
         Action = "sts:AssumeRole",
         Effect = "Allow",
         Principal = {
-          Service = "events.amazonaws.com"
+          Service = "events.amazonaws.com",
+        }
+      },
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          Service = "lambda.amazonaws.com",
         }
       }
     ]
@@ -132,9 +139,9 @@ resource "aws_sfn_state_machine" "this" {
         "Resource" : "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
         "Parameters" : {
           # pass state input value from repository-name and image-tag, not output
-          "repository-name.$": "$$.Execution.Input.repository-name",
-          "image-tag.$": "$$.Execution.Input.image-tag",
-          "service-name": aws_ecs_service.this[0].name
+          "repository-name.$" : "$$.Execution.Input.repository-name",
+          "image-tag.$" : "$$.Execution.Input.image-tag",
+          "service-name" : aws_ecs_service.this[0].name
         },
         "End" : true,
         "Catch" : [
