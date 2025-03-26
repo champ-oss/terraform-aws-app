@@ -143,7 +143,7 @@ resource "aws_sfn_state_machine" "this" {
           "image-tag.$" : "$$.Execution.Input.image-tag",
           "service-name" : aws_ecs_service.this[0].name,
           "cluster-name" : var.cluster,
-          "sha" : "$$.Execution.Input.image-digest",
+          "image-digest" : "$$.Execution.Input.image-digest"
         },
         "End" : true,
         "Catch" : [
