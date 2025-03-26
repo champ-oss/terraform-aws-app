@@ -39,6 +39,13 @@ resource "aws_iam_role" "step_functions_role" {
         Principal = {
           Service = "states.amazonaws.com"
         }
+      },
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
       }
     ]
   })
@@ -66,13 +73,6 @@ resource "aws_iam_role" "eventbridge_role" {
         Effect = "Allow",
         Principal = {
           Service = "events.amazonaws.com",
-        }
-      },
-      {
-        Action = "sts:AssumeRole",
-        Effect = "Allow",
-        Principal = {
-          Service = "lambda.amazonaws.com",
         }
       }
     ]
