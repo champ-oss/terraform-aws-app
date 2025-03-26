@@ -131,8 +131,8 @@ resource "aws_sfn_state_machine" "this" {
         "Type" : "Task",
         "Resource" : "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
         "Parameters" : {
-          "repository-name.$" : "$.input.repository-name",
-          "image-tag.$" : "$.input.image-tag",
+          "repository-name.$" : "$.id1.output.repository-name",
+          "image-tag.$" : "$.id1.output.image-tag",
           "service-name": aws_ecs_service.this[0].name
         },
         "End" : true,
