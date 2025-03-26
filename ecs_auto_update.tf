@@ -132,8 +132,8 @@ resource "aws_sfn_state_machine" "this" {
         "Resource" : "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
         "Parameters" : {
           # pass state input value from repository-name and image-tag, not output
-          "repository-name.$" : "$input.repository-name",
-          "image-tag.$" : "$input.image-tag",
+          "repository-name.$": "$.repository-name",
+          "image-tag.$": "$.image-tag",
           "service-name": aws_ecs_service.this[0].name
         },
         "End" : true,
