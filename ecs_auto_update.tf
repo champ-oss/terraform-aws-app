@@ -162,18 +162,18 @@ resource "aws_sfn_state_machine" "this" {
         "Type": "Choice",
         "Choices": [
           {
-            "Variable": "$.ecsResponse.services[0].deployments[0].status",
+            "Variable": "$.Services[0].Deployments[0].Status",
             "StringEquals": "PRIMARY",
             "Next": "SendSuccessNotification"
           },
           {
-            "Variable": "$.ecsResponse.services[0].deployments[0].status",
+            "Variable": "$.Services[0].Deployments[0].Status",
             "StringEquals": "FAILED",
             "Next": "SendFailureNotification"
           }
         ],
         "Default": "CheckRetryCount"
-      },
+      }
       "CheckRetryCount": {
         "Type": "Choice",
         "Choices": [
