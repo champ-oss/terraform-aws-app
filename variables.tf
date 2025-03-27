@@ -512,3 +512,9 @@ variable "enable_ecs_auto_update" {
   type        = bool
   default     = false
 }
+
+variable "ecs_slack_notification_lambda" {
+  description = "Slack notification lambda"
+  type        = string
+  default     = "ecs-slack-notification"
+}
