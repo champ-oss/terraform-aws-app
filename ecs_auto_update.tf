@@ -151,18 +151,23 @@ resource "aws_sfn_state_machine" "this" {
           "Cluster": var.cluster,
           "Services": [aws_ecs_service.this[0].name]
         },
+        "Next": "LogServiceResponse"
+      },
+      "LogServiceResponse": {
+        "Type": "Pass",
+        "ResultPath": "$.ecsResponse",
         "Next": "EvaluateServiceStatus"
       },
       "EvaluateServiceStatus": {
         "Type": "Choice",
         "Choices": [
           {
-            "Variable": "$.services[0].deployments[0].status",
+            "Variable": "$.ecsResponse.services[0].deployments[0].status",
             "StringEquals": "PRIMARY",
             "Next": "SendSuccessNotification"
           },
           {
-            "Variable": "$.services[0].deployments[0].status",
+            "Variable": "$.ecsResponse.services[0].deployments[0].status",
             "StringEquals": "FAILED",
             "Next": "SendFailureNotification"
           }
