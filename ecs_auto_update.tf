@@ -112,97 +112,50 @@ resource "aws_sfn_state_machine" "this" {
   count = var.enabled && var.enable_ecs_auto_update ? 1 : 0
   name  = substr("${var.git}-${var.name}", 0, 64)
   tags  = merge(local.tags, var.tags)
+
   definition = jsonencode({
-    "Comment" : "State machine to update ECS service on new ECR image push",
-    "StartAt" : "UpdateECSService",
+    "Comment" : "State machine to update ECS service on new ECR image push and simulate failure",
+    "StartAt" : "SimulateFailure",
     "States" : {
-      "UpdateECSService" : {
-        "Type" : "Task",
-        "Resource" : "arn:aws:states:::aws-sdk:ecs:updateService",
-        "Parameters" : {
-          "Cluster" : var.cluster,
-          "Service" : aws_ecs_service.this[0].name,
-          "ForceNewDeployment" : true
+      "SimulateFailure" : {
+        "Type" : "Pass",
+        "Result" : {
+          "Services": [
+            {
+              "deployments": [
+                {
+                  "status": "FAILED"
+                }
+              ]
+            }
+          ]
         },
-        "Retry" : [
-          {
-            "ErrorEquals" : ["ECS.ServiceUpdateException"],
-            "IntervalSeconds" : 5,
-            "MaxAttempts" : 3,
-            "BackoffRate" : 2.0
-          }
-        ],
-        "Next" : "InitializeRetry"
-      },
-      "InitializeRetry": {
-        "Type": "Pass",
-        "Result": { "retryCount": 0 },
-        "Next": "WaitForServiceStabilization"
-      },
-      "WaitForServiceStabilization": {
-        "Type": "Wait",
-        "Seconds": 30,
-        "Next": "CheckServiceStatus"
-      },
-      "CheckServiceStatus": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::aws-sdk:ecs:describeServices",
-        "Parameters": {
-          "Cluster": var.cluster,
-          "Services": [aws_ecs_service.this[0].name]
-        },
-        "Next": "LogServiceResponse"
-      },
-      "LogServiceResponse": {
-        "Type": "Pass",
-        "ResultPath": "$.ecsResponse",
+        "ResultPath": "$",
         "Next": "EvaluateServiceStatus"
       },
-      "EvaluateServiceStatus": {
-        "Type": "Choice",
-        "Choices": [
+      "EvaluateServiceStatus" : {
+        "Type" : "Choice",
+        "Choices" : [
           {
-            "Variable": "$.Services[0].Deployments[0].Status",
-            "StringEquals": "PRIMARY",
-            "Next": "SendSuccessNotification"
+            "Variable" : "$.Services[0].deployments[0].status",
+            "StringEquals" : "PRIMARY",
+            "Next" : "SendSuccessNotification"
           },
           {
-            "Variable": "$.Services[0].Deployments[0].Status",
-            "StringEquals": "FAILED",
-            "Next": "SendFailureNotification"
+            "Variable" : "$.Services[0].deployments[0].status",
+            "StringEquals" : "FAILED",
+            "Next" : "SendFailureNotification"
           }
         ],
-        "Default": "CheckRetryCount"
-      }
-      "CheckRetryCount": {
-        "Type": "Choice",
-        "Choices": [
-          {
-            "Variable": "$.retryCount",
-            "NumericGreaterThanEquals": 20,
-            "Next": "SendFailureNotification"
-          }
-        ],
-        "Default": "IncrementRetryCount"
-      },
-      "IncrementRetryCount": {
-        "Type": "Pass",
-        "ResultPath": "$.retryCount",
-        "Parameters": {
-          "value.$": "States.MathAdd($.retryCount, 1)"
-        },
-        "Next": "WaitForServiceStabilization"
+        "Default" : "CheckRetryCount"
       },
       "SendSuccessNotification" : {
         "Type" : "Task",
         "Resource" : "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
         "Parameters" : {
-          "status" : "SUCCESS",
-          "repository-name.$" : "$$.Execution.Input.repository-name",
-          "image-tag.$" : "$$.Execution.Input.image-tag",
+          "status": "SUCCESS",
           "service-name" : aws_ecs_service.this[0].name,
-          "cluster-name" : var.cluster,
-          "image-digest.$" : "$$.Execution.Input.image-digest"
+          "cluster-name" : var.cluster
         },
         "End" : true
       },
@@ -210,16 +163,19 @@ resource "aws_sfn_state_machine" "this" {
         "Type" : "Task",
         "Resource" : "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
         "Parameters" : {
-          "status" : "FAILED",
-          "repository-name.$" : "$$.Execution.Input.repository-name",
-          "image-tag.$" : "$$.Execution.Input.image-tag",
+          "status": "FAILED",
           "service-name" : aws_ecs_service.this[0].name,
-          "cluster-name" : var.cluster,
-          "image-digest.$" : "$$.Execution.Input.image-digest"
+          "cluster-name" : var.cluster
         },
+        "End" : true
+      },
+      "CheckRetryCount" : {
+        "Type" : "Pass",
+        "Result" : "Unknown status or no matching state.",
         "End" : true
       }
     }
   })
+
   role_arn = aws_iam_role.step_functions_role[0].arn
 }
