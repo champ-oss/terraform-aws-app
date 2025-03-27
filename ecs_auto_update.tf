@@ -165,7 +165,10 @@ resource "aws_sfn_state_machine" "this" {
         "Parameters" : {
           "status": "FAILED",
           "service-name" : aws_ecs_service.this[0].name,
-          "cluster-name" : var.cluster
+          "cluster-name" : var.cluster,
+          "image-digest" : "sha256:1234543509248503",
+          "image-tag" : "develop-latest",
+          "repository-name" : "terraform-testing"
         },
         "End" : true
       },
