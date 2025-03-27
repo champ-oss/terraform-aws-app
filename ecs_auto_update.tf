@@ -132,31 +132,86 @@ resource "aws_sfn_state_machine" "this" {
             "BackoffRate" : 2.0
           }
         ],
-        "Next" : "SendSlackNotification"
+        "Next" : "InitializeRetry"
       },
-      "SendSlackNotification" : {
+      "InitializeRetry": {
+        "Type": "Pass",
+        "Result": { "retryCount": 0 },
+        "Next": "WaitForServiceStabilization"
+      },
+      "WaitForServiceStabilization": {
+        "Type": "Wait",
+        "Seconds": 30,
+        "Next": "CheckServiceStatus"
+      },
+      "CheckServiceStatus": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::aws-sdk:ecs:describeServices",
+        "Parameters": {
+          "Cluster": var.cluster,
+          "Services": [aws_ecs_service.this[0].name]
+        },
+        "Next": "EvaluateServiceStatus"
+      },
+      "EvaluateServiceStatus": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$.services[0].deployments[0].status",
+            "StringEquals": "PRIMARY",
+            "Next": "SendSuccessNotification"
+          },
+          {
+            "Variable": "$.services[0].deployments[0].status",
+            "StringEquals": "FAILED",
+            "Next": "SendFailureNotification"
+          }
+        ],
+        "Default": "CheckRetryCount"
+      },
+      "CheckRetryCount": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$.retryCount",
+            "NumericGreaterThanEquals": 20,
+            "Next": "SendFailureNotification"
+          }
+        ],
+        "Default": "IncrementRetryCount"
+      },
+      "IncrementRetryCount": {
+        "Type": "Pass",
+        "ResultPath": "$.retryCount",
+        "Parameters": {
+          "value.$": "States.MathAdd($.retryCount, 1)"
+        },
+        "Next": "WaitForServiceStabilization"
+      },
+      "SendSuccessNotification" : {
         "Type" : "Task",
         "Resource" : "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
         "Parameters" : {
-          # pass state input value from repository-name and image-tag, not output
+          "status" : "SUCCESS",
           "repository-name.$" : "$$.Execution.Input.repository-name",
           "image-tag.$" : "$$.Execution.Input.image-tag",
           "service-name" : aws_ecs_service.this[0].name,
           "cluster-name" : var.cluster,
-          "image-digest.$" : "$$.Execution.Input.image-digest",
+          "image-digest.$" : "$$.Execution.Input.image-digest"
         },
-        "End" : true,
-        "Catch" : [
-          {
-            "ErrorEquals" : ["Lambda.Unknown", "Lambda.ServiceException", "Lambda.ResourceNotFoundException"],
-            "ResultPath" : "$.error",
-            "Next" : "HandleError"
-          }
-        ]
+        "End" : true
       },
-      "HandleError" : {
-        "Type" : "Pass",
-        "Result" : "Lambda function not found or failed. Continuing without Slack notification.",
+      "SendFailureNotification" : {
+        "Type" : "Task",
+        "Resource" : "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
+        "Parameters" : {
+          "status" : "FAILED",
+          "repository-name.$" : "$$.Execution.Input.repository-name",
+          "image-tag.$" : "$$.Execution.Input.image-tag",
+          "service-name" : aws_ecs_service.this[0].name,
+          "cluster-name" : var.cluster,
+          "image-digest.$" : "$$.Execution.Input.image-digest"
+        },
         "End" : true
       }
     }
