@@ -126,7 +126,13 @@ resource "aws_sfn_state_machine" "this" {
         },
         "Retry": [
           {
-            "ErrorEquals": ["ECS.ServiceUpdateException", "States.ALL"],
+            "ErrorEquals": ["ECS.ServiceUpdateException"],
+            "IntervalSeconds": 5,
+            "MaxAttempts": 5,
+            "BackoffRate": 2.0
+          },
+          {
+            "ErrorEquals": ["States.ALL"],
             "IntervalSeconds": 5,
             "MaxAttempts": 5,
             "BackoffRate": 2.0
@@ -240,4 +246,3 @@ resource "aws_sfn_state_machine" "this" {
   })
   role_arn = aws_iam_role.step_functions_role[0].arn
 }
-
