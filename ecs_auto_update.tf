@@ -181,7 +181,7 @@ resource "aws_sfn_state_machine" "this" {
           }
         ],
         "Default": "CheckRetryCount"
-      }
+      },
       "CheckRetryCount": {
         "Type": "Choice",
         "Choices": [
