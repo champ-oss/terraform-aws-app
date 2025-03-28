@@ -126,9 +126,9 @@ resource "aws_sfn_state_machine" "this" {
         },
         "Retry": [
           {
-            "ErrorEquals": ["ECS.ServiceUpdateException"],
+            "ErrorEquals": ["ECS.ServiceUpdateException", "States.ALL"],
             "IntervalSeconds": 5,
-            "MaxAttempts": 3,
+            "MaxAttempts": 5,
             "BackoffRate": 2.0
           }
         ],
@@ -150,7 +150,7 @@ resource "aws_sfn_state_machine" "this" {
         "Resource": "arn:aws:states:::aws-sdk:ecs:describeServices",
         "Parameters": {
           "Cluster": var.cluster,
-          "Services": [aws_ecs_service.this[0].name,]
+          "Services": [aws_ecs_service.this[0].name]
         },
         "Next": "LogServiceResponse"
       },
@@ -195,7 +195,7 @@ resource "aws_sfn_state_machine" "this" {
         "Type": "Choice",
         "Choices": [
           {
-            "Variable": "$.retryCount.retryCount",
+            "Variable": "$.retryCount",
             "NumericGreaterThanEquals": 20,
             "Next": "SendFailureNotification"
           }
@@ -206,7 +206,7 @@ resource "aws_sfn_state_machine" "this" {
         "Type": "Pass",
         "ResultPath": "$.retryCount",
         "Parameters": {
-          "retryCount.$": "States.MathAdd($.retryCount.retryCount, 1)"
+          "retryCount.$": "States.MathAdd($.retryCount, 1)"
         },
         "Next": "WaitForServiceStabilization"
       },
@@ -240,3 +240,4 @@ resource "aws_sfn_state_machine" "this" {
   })
   role_arn = aws_iam_role.step_functions_role[0].arn
 }
+
