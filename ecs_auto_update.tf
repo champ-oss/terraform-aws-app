@@ -113,30 +113,37 @@ resource "aws_sfn_state_machine" "this" {
   name  = substr("${var.git}-${var.name}", 0, 64)
   tags  = merge(local.tags, var.tags)
   definition = jsonencode({
-    "Comment" : "State machine to update ECS service on new ECR image push",
-    "StartAt" : "UpdateECSService",
-    "States" : {
-      "UpdateECSService" : {
-        "Type" : "Task",
-        "Resource" : "arn:aws:states:::aws-sdk:ecs:updateService",
-        "Parameters" : {
-          "Cluster" : var.cluster,
-          "Service" : aws_ecs_service.this[0].name,
-          "ForceNewDeployment" : true
+    "Comment": "State machine to update ECS service on new ECR image push",
+    "StartAt": "UpdateECSService",
+    "States": {
+      "UpdateECSService": {
+        "Type": "Task",
+        "Resource": "arn:aws:states:::aws-sdk:ecs:updateService",
+        "Parameters": {
+          "Cluster": var.cluster,
+          "Service": aws_ecs_service.this[0].name,
+          "ForceNewDeployment": true
         },
-        "Retry" : [
+        "Retry": [
           {
-            "ErrorEquals" : ["ECS.ServiceUpdateException"],
-            "IntervalSeconds" : 5,
-            "MaxAttempts" : 3,
-            "BackoffRate" : 2.0
+            "ErrorEquals": ["ECS.ServiceUpdateException"],
+            "IntervalSeconds": 5,
+            "MaxAttempts": 5,
+            "BackoffRate": 2.0
+          },
+          {
+            "ErrorEquals": ["States.ALL"],
+            "IntervalSeconds": 5,
+            "MaxAttempts": 5,
+            "BackoffRate": 2.0
           }
         ],
-        "Next" : "InitializeRetry"
+        "Next": "InitializeRetry"
       },
       "InitializeRetry": {
         "Type": "Pass",
         "Result": { "retryCount": 0 },
+        "ResultPath": "$.retryCount",
         "Next": "WaitForServiceStabilization"
       },
       "WaitForServiceStabilization": {
@@ -156,24 +163,40 @@ resource "aws_sfn_state_machine" "this" {
       "LogServiceResponse": {
         "Type": "Pass",
         "ResultPath": "$.ecsResponse",
-        "Next": "EvaluateServiceStatus"
+        "Next": "FindPrimaryDeployment"
       },
-      "EvaluateServiceStatus": {
+      "FindPrimaryDeployment": {
         "Type": "Choice",
         "Choices": [
           {
-            "Variable": "$.Services[0].Deployments[0].Status",
+            "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
             "StringEquals": "PRIMARY",
-            "Next": "SendSuccessNotification"
+            "Next": "EvaluatePrimaryRolloutState"
           },
           {
-            "Variable": "$.Services[0].Deployments[0].Status",
+            "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
             "StringEquals": "FAILED",
             "Next": "SendFailureNotification"
           }
         ],
         "Default": "CheckRetryCount"
-      }
+      },
+      "EvaluatePrimaryRolloutState": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$.ecsResponse.Services[0].Deployments[0].RolloutState",
+            "StringEquals": "COMPLETED",
+            "Next": "SendSuccessNotification"
+          },
+          {
+            "Variable": "$.ecsResponse.Services[0].Deployments[0].RolloutState",
+            "StringEquals": "FAILED",
+            "Next": "SendFailureNotification"
+          }
+        ],
+        "Default": "CheckRetryCount"
+      },
       "CheckRetryCount": {
         "Type": "Choice",
         "Choices": [
@@ -189,35 +212,35 @@ resource "aws_sfn_state_machine" "this" {
         "Type": "Pass",
         "ResultPath": "$.retryCount",
         "Parameters": {
-          "value.$": "States.MathAdd($.retryCount, 1)"
+          "retryCount.$": "States.MathAdd($.retryCount, 1)"
         },
         "Next": "WaitForServiceStabilization"
       },
-      "SendSuccessNotification" : {
-        "Type" : "Task",
-        "Resource" : "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
-        "Parameters" : {
-          "status" : "SUCCESS",
-          "repository-name.$" : "$$.Execution.Input.repository-name",
-          "image-tag.$" : "$$.Execution.Input.image-tag",
-          "service-name" : aws_ecs_service.this[0].name,
-          "cluster-name" : var.cluster,
-          "image-digest.$" : "$$.Execution.Input.image-digest"
+      "SendSuccessNotification": {
+        "Type": "Task",
+        "Resource": "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
+        "Parameters": {
+          "status": "SUCCESS",
+          "repository-name.$": "$$.Execution.Input.repository-name",
+          "image-tag.$": "$$.Execution.Input.image-tag",
+          "service-name": aws_ecs_service.this[0].name,
+          "cluster-name": var.cluster,
+          "image-digest.$": "$$.Execution.Input.image-digest"
         },
-        "End" : true
+        "End": true
       },
-      "SendFailureNotification" : {
-        "Type" : "Task",
-        "Resource" : "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
-        "Parameters" : {
-          "status" : "FAILED",
-          "repository-name.$" : "$$.Execution.Input.repository-name",
-          "image-tag.$" : "$$.Execution.Input.image-tag",
-          "service-name" : aws_ecs_service.this[0].name,
-          "cluster-name" : var.cluster,
-          "image-digest.$" : "$$.Execution.Input.image-digest"
+      "SendFailureNotification": {
+        "Type": "Task",
+        "Resource": "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
+        "Parameters": {
+          "status": "FAILED",
+          "repository-name.$": "$$.Execution.Input.repository-name",
+          "image-tag.$": "$$.Execution.Input.image-tag",
+          "service-name": aws_ecs_service.this[0].name,
+          "cluster-name": var.cluster,
+          "image-digest.$": "$$.Execution.Input.image-digest"
         },
-        "End" : true
+        "End": true
       }
     }
   })
