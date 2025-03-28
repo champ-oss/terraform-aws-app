@@ -136,7 +136,8 @@ resource "aws_sfn_state_machine" "this" {
       },
       "InitializeRetry": {
         "Type": "Pass",
-        "Result": { "retryCount": 0 },
+        "Result": { "retryCount": 0 },  # Ensure retryCount is initialized here
+        "ResultPath": "$.retryCount",  # Set retryCount to the state machine context
         "Next": "WaitForServiceStabilization"
       },
       "WaitForServiceStabilization": {
@@ -197,7 +198,7 @@ resource "aws_sfn_state_machine" "this" {
         "Type": "Pass",
         "ResultPath": "$.retryCount",
         "Parameters": {
-          "value.$": "States.MathAdd($.retryCount, 1)"
+          "value.$": "States.MathAdd($.retryCount, 1)"  # Increment the retryCount here
         },
         "Next": "WaitForServiceStabilization"
       },
