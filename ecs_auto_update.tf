@@ -136,7 +136,8 @@ resource "aws_sfn_state_machine" "this" {
       },
       "InitializeRetry": {
         "Type": "Pass",
-        "Result": { "retryCount": 0 },
+        "Result": { "retryCount": 0 },  # Ensure retryCount is initialized here
+        "ResultPath": "$.retryCount",  # Set retryCount to the state machine context
         "Next": "WaitForServiceStabilization"
       },
       "WaitForServiceStabilization": {
@@ -162,8 +163,16 @@ resource "aws_sfn_state_machine" "this" {
         "Type": "Choice",
         "Choices": [
           {
-            "Variable": "$.Services[0].Deployments[0].Status",
-            "StringEquals": "PRIMARY",
+            "And": [
+              {
+                "Variable": "$.Services[0].Deployments[0].Status",
+                "StringEquals": "PRIMARY"
+              },
+              {
+                "Variable": "$.Services[0].Deployments[0].RunningCount",
+                "NumericGreaterThanEquals": 1
+              }
+            ],
             "Next": "SendSuccessNotification"
           },
           {
@@ -173,7 +182,7 @@ resource "aws_sfn_state_machine" "this" {
           }
         ],
         "Default": "CheckRetryCount"
-      }
+      },
       "CheckRetryCount": {
         "Type": "Choice",
         "Choices": [
@@ -189,7 +198,7 @@ resource "aws_sfn_state_machine" "this" {
         "Type": "Pass",
         "ResultPath": "$.retryCount",
         "Parameters": {
-          "value.$": "States.MathAdd($.retryCount, 1)"
+          "value.$": "States.MathAdd($.retryCount, 1)"  # Increment the retryCount here
         },
         "Next": "WaitForServiceStabilization"
       },
