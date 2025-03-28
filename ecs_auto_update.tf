@@ -134,64 +134,80 @@ resource "aws_sfn_state_machine" "this" {
         ],
         "Next" : "InitializeRetry"
       },
-      "InitializeRetry": {
-        "Type": "Pass",
-        "Result": { "retryCount": 0 },
-        "Next": "WaitForServiceStabilization"
+      "InitializeRetry" : {
+        "Type" : "Pass",
+        "Result" : { "retryCount" : 0 },
+        "Next" : "WaitForServiceStabilization"
       },
-      "WaitForServiceStabilization": {
-        "Type": "Wait",
-        "Seconds": 30,
-        "Next": "CheckServiceStatus"
+      "WaitForServiceStabilization" : {
+        "Type" : "Wait",
+        "Seconds" : 30,
+        "Next" : "CheckServiceStatus"
       },
-      "CheckServiceStatus": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::aws-sdk:ecs:describeServices",
-        "Parameters": {
-          "Cluster": var.cluster,
-          "Services": [aws_ecs_service.this[0].name]
+      "CheckServiceStatus" : {
+        "Type" : "Task",
+        "Resource" : "arn:aws:states:::aws-sdk:ecs:describeServices",
+        "Parameters" : {
+          "Cluster" : var.cluster,
+          "Services" : [aws_ecs_service.this[0].name]
         },
-        "Next": "LogServiceResponse"
+        "Next" : "LogServiceResponse"
       },
-      "LogServiceResponse": {
-        "Type": "Pass",
-        "ResultPath": "$.ecsResponse",
-        "Next": "EvaluateServiceStatus"
+      "LogServiceResponse" : {
+        "Type" : "Pass",
+        "ResultPath" : "$.ecsResponse",
+        "Next" : "FindPrimaryDeployment"
       },
-      "EvaluateServiceStatus": {
-        "Type": "Choice",
-        "Choices": [
+      "FindPrimaryDeployment" : {
+        "Type" : "Choice",
+        "Choices" : [
           {
-            "Variable": "$.Services[0].Deployments[?(@.Status=='FAILED')]",
-            "IsPresent": true,
-            "Next": "SendFailureNotification"
+            "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
+            "StringEquals" : "PRIMARY",
+            "Next" : "EvaluatePrimaryRolloutState"
           },
           {
-            "Variable": "$.Services[0].Deployments[?(@.Status=='PRIMARY')].RolloutState",
-            "StringEquals": "COMPLETED",
-            "Next": "SendSuccessNotification"
+            "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
+            "StringEquals" : "FAILED",
+            "Next" : "SendFailureNotification"
           }
         ],
-        "Default": "CheckRetryCount"
+        "Default" : "CheckRetryCount"
       },
-      "CheckRetryCount": {
-        "Type": "Choice",
-        "Choices": [
+      "EvaluatePrimaryRolloutState" : {
+        "Type" : "Choice",
+        "Choices" : [
           {
-            "Variable": "$.retryCount",
-            "NumericGreaterThanEquals": 20,
-            "Next": "SendFailureNotification"
+            "Variable" : "$.ecsResponse.Services[0].Deployments[0].RolloutState",
+            "StringEquals" : "COMPLETED",
+            "Next" : "SendSuccessNotification"
+          },
+          {
+            "Variable" : "$.ecsResponse.Services[0].Deployments[0].RolloutState",
+            "StringEquals" : "FAILED",
+            "Next" : "SendFailureNotification"
           }
         ],
-        "Default": "IncrementRetryCount"
+        "Default" : "CheckRetryCount"
       },
-      "IncrementRetryCount": {
-        "Type": "Pass",
-        "ResultPath": "$.retryCount",
-        "Parameters": {
-          "value.$": "States.MathAdd($.retryCount, 1)"
+      "CheckRetryCount" : {
+        "Type" : "Choice",
+        "Choices" : [
+          {
+            "Variable" : "$.retryCount",
+            "NumericGreaterThanEquals" : 20,
+            "Next" : "SendFailureNotification"
+          }
+        ],
+        "Default" : "IncrementRetryCount"
+      },
+      "IncrementRetryCount" : {
+        "Type" : "Pass",
+        "ResultPath" : "$.retryCount",
+        "Parameters" : {
+          "value.$" : "States.MathAdd($.retryCount, 1)"
         },
-        "Next": "WaitForServiceStabilization"
+        "Next" : "WaitForServiceStabilization"
       },
       "SendSuccessNotification" : {
         "Type" : "Task",
@@ -214,7 +230,7 @@ resource "aws_sfn_state_machine" "this" {
           "repository-name.$" : "$$.Execution.Input.repository-name",
           "image-tag.$" : "$$.Execution.Input.image-tag",
           "service-name" : aws_ecs_service.this[0].name,
-          "cluster-name" : var.cluster,
+          "cluster-name" : var.cluster
           "image-digest.$" : "$$.Execution.Input.image-digest"
         },
         "End" : true
