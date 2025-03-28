@@ -121,7 +121,7 @@ resource "aws_sfn_state_machine" "this" {
         "Resource": "arn:aws:states:::aws-sdk:ecs:updateService",
         "Parameters": {
           "Cluster": var.cluster,
-          "Service": aws_ecs_service.this[0].name,,
+          "Service": aws_ecs_service.this[0].name,
           "ForceNewDeployment": true
         },
         "Retry": [
