@@ -162,18 +162,18 @@ resource "aws_sfn_state_machine" "this" {
         "Type": "Choice",
         "Choices": [
           {
-            "Variable": "$.Services[0].Deployments[0].Status",
-            "StringEquals": "PRIMARY",
-            "Next": "SendSuccessNotification"
+            "Variable": "$.Services[0].Deployments[?(@.Status=='FAILED')]",
+            "IsPresent": true,
+            "Next": "SendFailureNotification"
           },
           {
-            "Variable": "$.Services[0].Deployments[0].Status",
-            "StringEquals": "FAILED",
-            "Next": "SendFailureNotification"
+            "Variable": "$.Services[0].Deployments[?(@.Status=='PRIMARY')].RolloutState",
+            "StringEquals": "COMPLETED",
+            "Next": "SendSuccessNotification"
           }
         ],
         "Default": "CheckRetryCount"
-      }
+      },
       "CheckRetryCount": {
         "Type": "Choice",
         "Choices": [
