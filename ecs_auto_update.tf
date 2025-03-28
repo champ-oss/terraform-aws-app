@@ -162,8 +162,16 @@ resource "aws_sfn_state_machine" "this" {
         "Type": "Choice",
         "Choices": [
           {
-            "Variable": "$.Services[0].Deployments[0].Status",
-            "StringEquals": "PRIMARY",
+            "And": [
+              {
+                "Variable": "$.Services[0].Deployments[0].Status",
+                "StringEquals": "PRIMARY"
+              },
+              {
+                "Variable": "$.Services[0].Deployments[0].RunningCount",
+                "NumericGreaterThanEquals": 1
+              }
+            ],
             "Next": "SendSuccessNotification"
           },
           {
