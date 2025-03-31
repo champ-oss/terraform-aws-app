@@ -132,75 +132,122 @@ resource "aws_sfn_state_machine" "this" {
             "BackoffRate" : 2.0
           }
         ],
-        "Next" : "InitializeRetry"
+        "Next" : "WaitForServiceStabilization"
       },
-      "InitializeRetry": {
-        "Type": "Pass",
-        "Result": { "retryCount": 0 },  # Ensure retryCount is initialized here
-        "ResultPath": "$.retryCount",  # Set retryCount to the state machine context
-        "Next": "WaitForServiceStabilization"
+      "WaitForServiceStabilization" : {
+        "Type" : "Wait",
+        "Seconds" : 30,
+        "Next" : "CheckIfFirstRetry"
       },
-      "WaitForServiceStabilization": {
-        "Type": "Wait",
-        "Seconds": 30,
-        "Next": "CheckServiceStatus"
+      "CheckIfFirstRetry" : {
+        "Type" : "Choice",
+        "Choices" : [
+          {
+            "Variable" : "$.RetryData.retryCount",
+            "IsPresent" : true,
+            "Next" : "CheckServiceStatus"
+          }
+        ],
+        "Default" : "InitializeRetry"
       },
-      "CheckServiceStatus": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::aws-sdk:ecs:describeServices",
-        "Parameters": {
-          "Cluster": var.cluster,
-          "Services": [aws_ecs_service.this[0].name]
+      "InitializeRetry" : {
+        "Type" : "Pass",
+        "Result" : { "RetryData" : { "retryCount" : 0 } },
+        "ResultPath" : "$",
+        "Next" : "CheckServiceStatus"
+      },
+      "CheckServiceStatus" : {
+        "Type" : "Task",
+        "Resource" : "arn:aws:states:::aws-sdk:ecs:describeServices",
+        "Parameters" : {
+          "Cluster" : var.cluster,
+          "Services" : [aws_ecs_service.this[0].name]
         },
-        "Next": "LogServiceResponse"
+        "ResultPath" : "$.ecsResponse",
+        "Next" : "MergeRetryData"
       },
-      "LogServiceResponse": {
-        "Type": "Pass",
-        "ResultPath": "$.ecsResponse",
-        "Next": "EvaluateServiceStatus"
+      "MergeRetryData" : {
+        "Type" : "Pass",
+        "Parameters" : {
+          "RetryData.$" : "$.RetryData",
+          "ecsResponse.$" : "$.ecsResponse"
+        },
+        "ResultPath" : "$",
+        "Next" : "EvaluateServiceStatus"
       },
-      "EvaluateServiceStatus": {
-        "Type": "Choice",
-        "Choices": [
+      "EvaluateServiceStatus" : {
+        "Type" : "Choice",
+        "Choices" : [
+          {
+            "And" : [
+              {
+                "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
+                "StringEquals" : "PRIMARY"
+              },
+              {
+                "Variable" : "$.ecsResponse.Services[0].Deployments[0].RunningCount",
+                "NumericGreaterThanEquals" : 1
+              }
+            ],
+            "Next" : "SendSuccessNotification"
+          },
           {
             "And": [
               {
-                "Variable": "$.Services[0].Deployments[0].Status",
+                "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
                 "StringEquals": "PRIMARY"
               },
               {
-                "Variable": "$.Services[0].Deployments[0].RunningCount",
-                "NumericGreaterThanEquals": 1
+                "Or": [
+                  {
+                    "Variable" : "$.ecsResponse.Services[0].Deployments[0].FailedTasks",
+                    "NumericGreaterThanEquals" : 1
+                  },
+                  {
+                    "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
+                    "StringEquals": "ROLLBACK_IN_PROGRESS"
+                  },
+                  {
+                    "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
+                    "StringEquals": "STOPPED"
+                  },
+                  {
+                    "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
+                    "StringEquals": "ROLLBACK_FAILED"
+                  },
+                  {
+                    "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
+                    "StringEquals": "ROLLBACK_COMPLETED"
+                  }
+                ]
               }
             ],
-            "Next": "SendSuccessNotification"
+            "Next": "SendFailureNotification"
+          }
+        ],
+        "Default" : "CheckRetryCount"
+      },
+      "CheckRetryCount" : {
+        "Type" : "Choice",
+        "Choices" : [
+          {
+            "Variable" : "$.RetryData.retryCount",
+            "NumericGreaterThanEquals" : 20,
+            "Next" : "SendFailureNotification"
+          }
+        ],
+        "Default" : "IncrementRetryCount"
+      },
+      "IncrementRetryCount" : {
+        "Type" : "Pass",
+        "Parameters" : {
+          "RetryData" : {
+            "retryCount.$" : "States.MathAdd($.RetryData.retryCount, 1)"
           },
-          {
-            "Variable": "$.Services[0].Deployments[0].Status",
-            "StringEquals": "FAILED",
-            "Next": "SendFailureNotification"
-          }
-        ],
-        "Default": "CheckRetryCount"
-      },
-      "CheckRetryCount": {
-        "Type": "Choice",
-        "Choices": [
-          {
-            "Variable": "$.retryCount",
-            "NumericGreaterThanEquals": 20,
-            "Next": "SendFailureNotification"
-          }
-        ],
-        "Default": "IncrementRetryCount"
-      },
-      "IncrementRetryCount": {
-        "Type": "Pass",
-        "ResultPath": "$.retryCount",
-        "Parameters": {
-          "value.$": "States.MathAdd($.retryCount, 1)"  # Increment the retryCount here
+          "ecsResponse.$" : "$.ecsResponse"
         },
-        "Next": "WaitForServiceStabilization"
+        "ResultPath" : "$",
+        "Next" : "WaitForServiceStabilization"
       },
       "SendSuccessNotification" : {
         "Type" : "Task",
