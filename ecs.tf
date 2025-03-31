@@ -74,8 +74,8 @@ resource "aws_ecs_service" "this" {
   }
 
   deployment_circuit_breaker {
-    enable   = !var.enable_ecs_auto_update ? var.deployment_circuit_breaker_enable : false
-    rollback = !var.enable_ecs_auto_update ? var.deployment_circuit_breaker_rollback : false
+    enable   = var.deployment_circuit_breaker_enable
+    rollback = var.deployment_circuit_breaker_rollback
   }
 
   lifecycle {
@@ -103,8 +103,8 @@ resource "aws_ecs_service" "disabled_load_balancer" {
   }
 
   deployment_circuit_breaker {
-    enable   = !var.enable_ecs_auto_update ? var.deployment_circuit_breaker_enable : false
-    rollback = !var.enable_ecs_auto_update ? var.deployment_circuit_breaker_rollback : false
+    enable   = var.deployment_circuit_breaker_enable
+    rollback = var.deployment_circuit_breaker_rollback
   }
 
   lifecycle {
