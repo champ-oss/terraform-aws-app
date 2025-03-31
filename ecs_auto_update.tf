@@ -134,92 +134,100 @@ resource "aws_sfn_state_machine" "this" {
         ],
         "Next" : "WaitForServiceStabilization"
       },
-      "WaitForServiceStabilization": {
-        "Type": "Wait",
-        "Seconds": 30,
-        "Next": "CheckIfFirstRetry"
+      "WaitForServiceStabilization" : {
+        "Type" : "Wait",
+        "Seconds" : 30,
+        "Next" : "CheckIfFirstRetry"
       },
-      "CheckIfFirstRetry": {
-        "Type": "Choice",
-        "Choices": [
+      "CheckIfFirstRetry" : {
+        "Type" : "Choice",
+        "Choices" : [
           {
-            "Variable": "$.RetryData.retryCount",
-            "IsPresent": true,
-            "Next": "CheckServiceStatus"
+            "Variable" : "$.RetryData.retryCount",
+            "IsPresent" : true,
+            "Next" : "CheckServiceStatus"
           }
         ],
-        "Default": "InitializeRetry"
+        "Default" : "InitializeRetry"
       },
-      "InitializeRetry": {
-        "Type": "Pass",
-        "Result": { "RetryData": { "retryCount": 0 } },
-        "ResultPath": "$",
-        "Next": "CheckServiceStatus"
+      "InitializeRetry" : {
+        "Type" : "Pass",
+        "Result" : { "RetryData" : { "retryCount" : 0 } },
+        "ResultPath" : "$",
+        "Next" : "CheckServiceStatus"
       },
-      "CheckServiceStatus": {
-        "Type": "Task",
-        "Resource": "arn:aws:states:::aws-sdk:ecs:describeServices",
-        "Parameters": {
-          "Cluster": var.cluster,
-          "Services": [aws_ecs_service.this[0].name]
+      "CheckServiceStatus" : {
+        "Type" : "Task",
+        "Resource" : "arn:aws:states:::aws-sdk:ecs:describeServices",
+        "Parameters" : {
+          "Cluster" : var.cluster,
+          "Services" : [aws_ecs_service.this[0].name]
         },
-        "ResultPath": "$.ecsResponse",
-        "Next": "MergeRetryData"
+        "ResultPath" : "$.ecsResponse",
+        "Next" : "MergeRetryData"
       },
-      "MergeRetryData": {
-        "Type": "Pass",
-        "Parameters": {
-          "RetryData.$": "$.RetryData",
-          "ecsResponse.$": "$.ecsResponse"
+      "MergeRetryData" : {
+        "Type" : "Pass",
+        "Parameters" : {
+          "RetryData.$" : "$.RetryData",
+          "ecsResponse.$" : "$.ecsResponse"
         },
-        "ResultPath": "$",
-        "Next": "EvaluateServiceStatus"
+        "ResultPath" : "$",
+        "Next" : "EvaluateServiceStatus"
       },
-      "EvaluateServiceStatus": {
-        "Type": "Choice",
-        "Choices": [
+      "EvaluateServiceStatus" : {
+        "Type" : "Choice",
+        "Choices" : [
           {
-            "And": [
+            "And" : [
               {
-                "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
-                "StringEquals": "PRIMARY"
+                "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
+                "StringEquals" : "PRIMARY"
               },
               {
-                "Variable": "$.ecsResponse.Services[0].Deployments[0].RunningCount",
-                "NumericGreaterThanEquals": 1
+                "Variable" : "$.ecsResponse.Services[0].Deployments[0].RunningCount",
+                "NumericGreaterThanEquals" : 1
               }
             ],
-            "Next": "SendSuccessNotification"
+            "Next" : "SendSuccessNotification"
           },
           {
-            "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
-            "StringEquals": "FAILED",
-            "Next": "SendFailureNotification"
+            "Or" : [
+              {
+                "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
+                "StringEquals" : "FAILED"
+              },
+              {
+                "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
+                "StringEquals" : "STOPPED"
+              }
+            ],
+            "Next" : "SendFailureNotification"
           }
         ],
-        "Default": "CheckRetryCount"
+        "Default" : "CheckRetryCount"
       },
-      "CheckRetryCount": {
-        "Type": "Choice",
-        "Choices": [
+      "CheckRetryCount" : {
+        "Type" : "Choice",
+        "Choices" : [
           {
-            "Variable": "$.RetryData.retryCount",
-            "NumericGreaterThanEquals": 20,
-            "Next": "SendFailureNotification"
+            "Variable" : "$.RetryData.retryCount",
+            "NumericGreaterThanEquals" : 20,
+            "Next" : "SendFailureNotification"
           }
         ],
-        "Default": "IncrementRetryCount"
+        "Default" : "IncrementRetryCount"
       },
-      "IncrementRetryCount": {
-        "Type": "Pass",
-        "Parameters": {
-          "RetryData": {
-            "retryCount.$": "States.MathAdd($.RetryData.retryCount, 1)"
+      "IncrementRetryCount" : {
+        "Type" : "Pass",
+        "Parameters" : {
+          "RetryData" : {
+            "retryCount.$" : "States.MathAdd($.RetryData.retryCount, 1)"
           },
-          "ecsResponse.$": "$.ecsResponse"
+          "ecsResponse.$" : "$.ecsResponse"
         },
-        "ResultPath": "$",
-        "Next": "WaitForServiceStabilization"
+        "ResultPath" : "$",
+        "Next" : "WaitForServiceStabilization"
       },
       "SendSuccessNotification" : {
         "Type" : "Task",
