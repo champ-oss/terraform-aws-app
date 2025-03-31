@@ -136,7 +136,7 @@ resource "aws_sfn_state_machine" "this" {
       },
       "WaitForServiceStabilization" : {
         "Type" : "Wait",
-        "Seconds" : 30,
+        "Seconds" : 15,
         "Next" : "CheckIfFirstRetry"
       },
       "CheckIfFirstRetry" : {
@@ -195,11 +195,15 @@ resource "aws_sfn_state_machine" "this" {
             "Or" : [
               {
                 "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
-                "StringEquals" : "FAILED"
+                "StringEquals" : "ROLLBACK_IN_PROGRESS"
               },
               {
                 "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
                 "StringEquals" : "STOPPED"
+              },
+              {
+                    "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
+                    "StringEquals" : "ROLLBACK_FAILED"
               }
             ],
             "Next" : "SendFailureNotification"
