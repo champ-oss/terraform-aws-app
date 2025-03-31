@@ -200,6 +200,10 @@ resource "aws_sfn_state_machine" "this" {
               {
                 "Or": [
                   {
+                    "Variable" : "$.ecsResponse.Services[0].Deployments[0].FailedTasks",
+                    "NumericGreaterThanEquals" : 1
+                  },
+                  {
                     "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
                     "StringEquals": "ROLLBACK_IN_PROGRESS"
                   },
