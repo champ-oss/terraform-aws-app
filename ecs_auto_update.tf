@@ -136,7 +136,7 @@ resource "aws_sfn_state_machine" "this" {
       },
       "WaitForServiceStabilization" : {
         "Type" : "Wait",
-        "Seconds" : 15,
+        "Seconds" : 30,
         "Next" : "CheckIfFirstRetry"
       },
       "CheckIfFirstRetry" : {
