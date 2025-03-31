@@ -192,21 +192,33 @@ resource "aws_sfn_state_machine" "this" {
             "Next" : "SendSuccessNotification"
           },
           {
-            "Or" : [
+            "And": [
               {
-                "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
-                "StringEquals" : "ROLLBACK_IN_PROGRESS"
+                "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
+                "StringEquals": "PRIMARY"
               },
               {
-                "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
-                "StringEquals" : "STOPPED"
-              },
-              {
-                    "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
-                    "StringEquals" : "ROLLBACK_FAILED"
+                "Or": [
+                  {
+                    "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
+                    "StringEquals": "ROLLBACK_IN_PROGRESS"
+                  },
+                  {
+                    "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
+                    "StringEquals": "STOPPED"
+                  },
+                  {
+                    "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
+                    "StringEquals": "ROLLBACK_FAILED"
+                  },
+                  {
+                    "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
+                    "StringEquals": "ROLLBACK_COMPLETED"
+                  }
+                ]
               }
             ],
-            "Next" : "SendFailureNotification"
+            "Next": "SendFailureNotification"
           }
         ],
         "Default" : "CheckRetryCount"
