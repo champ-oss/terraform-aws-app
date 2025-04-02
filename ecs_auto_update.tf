@@ -192,37 +192,37 @@ resource "aws_sfn_state_machine" "this" {
             "Next" : "SendSuccessNotification"
           },
           {
-            "And": [
+            "And" : [
               {
-                "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
-                "StringEquals": "PRIMARY"
+                "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
+                "StringEquals" : "PRIMARY"
               },
               {
-                "Or": [
+                "Or" : [
                   {
                     "Variable" : "$.ecsResponse.Services[0].Deployments[0].FailedTasks",
                     "NumericGreaterThanEquals" : 1
                   },
                   {
-                    "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
-                    "StringEquals": "ROLLBACK_IN_PROGRESS"
+                    "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
+                    "StringEquals" : "ROLLBACK_IN_PROGRESS"
                   },
                   {
-                    "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
-                    "StringEquals": "STOPPED"
+                    "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
+                    "StringEquals" : "STOPPED"
                   },
                   {
-                    "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
-                    "StringEquals": "ROLLBACK_FAILED"
+                    "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
+                    "StringEquals" : "ROLLBACK_FAILED"
                   },
                   {
-                    "Variable": "$.ecsResponse.Services[0].Deployments[0].Status",
-                    "StringEquals": "ROLLBACK_COMPLETED"
+                    "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
+                    "StringEquals" : "ROLLBACK_COMPLETED"
                   }
                 ]
               }
             ],
-            "Next": "SendFailureNotification"
+            "Next" : "SendFailureNotification"
           }
         ],
         "Default" : "CheckRetryCount"
@@ -258,6 +258,7 @@ resource "aws_sfn_state_machine" "this" {
           "image-tag.$" : "$$.Execution.Input.image-tag",
           "service-name" : aws_ecs_service.this[0].name,
           "cluster-name" : var.cluster,
+          "ecs-slack-channel" : var.ecs_slack_channel,
           "image-digest.$" : "$$.Execution.Input.image-digest"
         },
         "End" : true
@@ -271,6 +272,7 @@ resource "aws_sfn_state_machine" "this" {
           "image-tag.$" : "$$.Execution.Input.image-tag",
           "service-name" : aws_ecs_service.this[0].name,
           "cluster-name" : var.cluster,
+          "ecs-slack-channel" : var.ecs_slack_channel,
           "image-digest.$" : "$$.Execution.Input.image-digest"
         },
         "End" : true

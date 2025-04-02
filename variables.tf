@@ -518,3 +518,8 @@ variable "ecs_slack_notification_lambda" {
   type        = string
   default     = "ecs-slack-notification"
 }
+
+variable "ecs_slack_channel" {
+  description = "Slack channel"
+  type        = string
+}
