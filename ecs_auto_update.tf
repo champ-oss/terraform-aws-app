@@ -103,7 +103,6 @@ resource "aws_iam_policy" "invoke_step_functions_policy" {
 
 resource "aws_iam_role_policy_attachment" "invoke_step_functions_attachment" {
   count      = var.enabled && var.enable_ecs_auto_update ? 1 : 0
-  name       = substr("${var.git}-${var.name}-invoke-step-functions-attachment", 0, 64)
   role      = aws_iam_role.eventbridge_role[0].name
   policy_arn = aws_iam_policy.invoke_step_functions_policy[0].arn
 }
