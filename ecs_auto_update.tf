@@ -13,8 +13,10 @@ resource "aws_cloudwatch_event_rule" "trigger_step_function" {
     detail-type = ["ECR Image Action"],
     detail = {
       "action-type" : ["PUSH"],
-      "repository-name" = [join("/", slice(split("/", split(":", var.image)[0]), 1, length(split("/", split(":", var.image)[0]))))]
-      "image-tags"      = [local.get_image],
+      "repository-name" = [join("/", slice(split("/", split(":", var.image)[0]), 1, length(split("/", split(":", var.image)[0]))))],
+      "image-tags"      = [{
+        "wildcard" = "*${local.get_image}*"
+      }]
     }
   })
 }
@@ -257,7 +259,7 @@ resource "aws_sfn_state_machine" "this" {
         "Parameters" : {
           "status" : "SUCCESS",
           "repository-name.$" : "$$.Execution.Input.repository-name",
-          "image-tag.$" : "$$.Execution.Input.image-tag",
+          "image-tag.$" : "$$.Execution.Input.image-tags[0]",
           "service-name" : try(aws_ecs_service.this[0].name, ""),
           "cluster-name" : var.cluster,
           "ecs-slack-channel" : var.ecs_slack_channel,
@@ -271,7 +273,7 @@ resource "aws_sfn_state_machine" "this" {
         "Parameters" : {
           "status" : "FAILED",
           "repository-name.$" : "$$.Execution.Input.repository-name",
-          "image-tag.$" : "$$.Execution.Input.image-tag",
+          "image-tag.$" : "$$.Execution.Input.image-tags[0]",
           "service-name" : try(aws_ecs_service.this[0].name, ""),
           "cluster-name" : var.cluster,
           "ecs-slack-channel" : var.ecs_slack_channel,
