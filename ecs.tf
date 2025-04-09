@@ -47,8 +47,8 @@ resource "aws_ecs_task_definition" "this" {
   tags                     = merge(local.tags, var.tags)
 
   runtime_platform {
-    cpu_architecture = var.cpu_architecture
-    operating_system = var.operating_system
+    cpu_architecture        = var.cpu_architecture
+    operating_system_family = var.operating_system
   }
 }
 
