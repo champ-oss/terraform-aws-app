@@ -10,12 +10,11 @@ resource "aws_cloudwatch_event_rule" "trigger_step_function" {
   tags           = merge(local.tags, var.tags)
   event_pattern = jsonencode({
     source      = ["aws.ecr"],
-    detail-type = ["ECR Image Action"],
+    detail-type = ["ECR Image Scan"],
     detail = {
-      "action-type" : ["PUSH"],
       "repository-name" = [join("/", slice(split("/", split(":", var.image)[0]), 1, length(split("/", split(":", var.image)[0]))))],
       "image-tags"      = [{
-        "wildcard" = "*${local.get_image}*"
+        "wildcard" = local.get_image
       }]
     }
   })
