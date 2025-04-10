@@ -54,7 +54,7 @@ resource "aws_iam_role" "step_functions_role" {
 
 resource "aws_iam_role_policy_attachment" "ecs_update_policy" {
   count      = var.enabled && var.enable_ecs_auto_update ? 1 : 0
-  role      = aws_iam_role.step_functions_role[0].name
+  role       = aws_iam_role.step_functions_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
 }
 
@@ -102,7 +102,7 @@ resource "aws_iam_policy" "invoke_step_functions_policy" {
 
 resource "aws_iam_role_policy_attachment" "invoke_step_functions_attachment" {
   count      = var.enabled && var.enable_ecs_auto_update ? 1 : 0
-  role      = aws_iam_role.eventbridge_role[0].name
+  role       = aws_iam_role.eventbridge_role[0].name
   policy_arn = aws_iam_policy.invoke_step_functions_policy[0].arn
 }
 
