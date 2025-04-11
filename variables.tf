@@ -524,15 +524,3 @@ variable "ecs_slack_channel" {
   type        = string
   default     = ""
 }
-
-variable "cpu_architecture" {
-  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_task_definition#cpu_architecture"
-  type        = string
-  default     = "X86_64"
-}
-
-variable "operating_system" {
-  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_task_definition#operating_system"
-  type        = string
-  default     = "LINUX"
-}
