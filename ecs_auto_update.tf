@@ -6,11 +6,17 @@ resource "aws_cloudwatch_event_rule" "trigger_step_function" {
   tags           = merge(local.tags, var.tags)
   event_pattern = jsonencode({
     source      = ["aws.ecr"],
-    detail-type = ["ECR Image Action"],
+    detail-type = ["AWS API Call via CloudTrail"],
     detail = {
-      "action-type" : ["PUSH"],
-      "repository-name" = [join("/", slice(split("/", split(":", var.image)[0]), 1, length(split("/", split(":", var.image)[0]))))]
-      "image-tag"       = [split(":", split("/", var.image)[1])[1]],
+      "eventName" : ["PutImage"],
+      "responseElements" : {
+        "image" : {
+          "repositoryName" : [join("/", slice(split("/", split(":", var.image)[0]), 1, length(split("/", split(":", var.image)[0]))))],
+          "imageId" : {
+            "imageTag" : [split(":", split("/", var.image)[1])[1]],
+          }
+        }
+      }
     }
   })
 }
@@ -252,12 +258,12 @@ resource "aws_sfn_state_machine" "this" {
         "Resource" : "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
         "Parameters" : {
           "status" : "SUCCESS",
-          "repository-name.$" : "$$.Execution.Input.repository-name",
-          "image-tag.$" : "$$.Execution.Input.image-tag",
+          "repository-name.$" : "$$.Execution.Input.responseElements.image.repositoryName",
+          "image-tag.$" : "$$.Execution.Input.Input.responseElements.image.imageId.imageTag",
           "service-name" : try(aws_ecs_service.this[0].name, ""),
           "cluster-name" : var.cluster,
           "ecs-slack-channel" : var.ecs_slack_channel,
-          "image-digest.$" : "$$.Execution.Input.image-digest"
+          "image-digest.$" : "$$.Execution.Input.Input.responseElements.image.imageId.imageDigest",
         },
         "End" : true
       },
@@ -266,12 +272,12 @@ resource "aws_sfn_state_machine" "this" {
         "Resource" : "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
         "Parameters" : {
           "status" : "FAILED",
-          "repository-name.$" : "$$.Execution.Input.repository-name",
-          "image-tag.$" : "$$.Execution.Input.image-tag",
+          "repository-name.$" : "$$.Execution.Input.responseElements.image.repositoryName",
+          "image-tag.$" : "$$.Execution.Input.Input.responseElements.image.imageId.imageTag",
           "service-name" : try(aws_ecs_service.this[0].name, ""),
           "cluster-name" : var.cluster,
           "ecs-slack-channel" : var.ecs_slack_channel,
-          "image-digest.$" : "$$.Execution.Input.image-digest"
+          "image-digest.$" : "$$.Execution.Input.Input.responseElements.image.imageId.imageDigest",
         },
         "End" : true
       }
