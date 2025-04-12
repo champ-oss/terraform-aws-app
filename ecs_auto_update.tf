@@ -259,11 +259,11 @@ resource "aws_sfn_state_machine" "this" {
         "Parameters" : {
           "status" : "SUCCESS",
           "repository-name.$" : "$$.Execution.Input.responseElements.image.repositoryName",
-          "image-tag.$" : "$$.Execution.Input.Input.responseElements.image.imageId.imageTag",
+          "image-tag.$" : "$$.Execution.Input.responseElements.image.imageId.imageTag",
           "service-name" : try(aws_ecs_service.this[0].name, ""),
           "cluster-name" : var.cluster,
           "ecs-slack-channel" : var.ecs_slack_channel,
-          "image-digest.$" : "$$.Execution.Input.Input.responseElements.image.imageId.imageDigest",
+          "image-digest.$" : "$$.Execution.Input.responseElements.image.imageId.imageDigest",
         },
         "End" : true
       },
@@ -273,11 +273,11 @@ resource "aws_sfn_state_machine" "this" {
         "Parameters" : {
           "status" : "FAILED",
           "repository-name.$" : "$$.Execution.Input.responseElements.image.repositoryName",
-          "image-tag.$" : "$$.Execution.Input.Input.responseElements.image.imageId.imageTag",
+          "image-tag.$" : "$$.Execution.Input.responseElements.image.imageId.imageTag",
           "service-name" : try(aws_ecs_service.this[0].name, ""),
           "cluster-name" : var.cluster,
           "ecs-slack-channel" : var.ecs_slack_channel,
-          "image-digest.$" : "$$.Execution.Input.Input.responseElements.image.imageId.imageDigest",
+          "image-digest.$" : "$$.Execution.Input.responseElements.image.imageId.imageDigest",
         },
         "End" : true
       }
