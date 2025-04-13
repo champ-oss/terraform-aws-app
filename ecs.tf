@@ -44,7 +44,16 @@ resource "aws_ecs_task_definition" "this" {
   network_mode             = "awsvpc"
   cpu                      = var.cpu
   memory                   = var.memory
-  tags                     = merge(local.tags, var.tags)
+
+  dynamic "runtime_platform" {
+    for_each = var.runtime_platform != null ? [1] : []
+    content {
+      cpu_architecture = var.runtime_platform["cpu_architecture"]
+      operating_system = var.runtime_platform["operating_system_family"]
+    }
+  }
+
+  tags = merge(local.tags, var.tags)
 }
 
 resource "aws_ecs_service" "this" {

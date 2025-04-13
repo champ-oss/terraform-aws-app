@@ -145,6 +145,10 @@ module "this" {
   lb_zone_id                  = module.core.lb_public_zone_id
   enable_route53              = true
   enable_route53_health_check = true
+  runtime_platform = {
+    cpu_architecture        = "X86_64"
+    operating_system_family = "LINUX"
+  }
   enabled                     = var.enabled
   #
   /* stickiness example

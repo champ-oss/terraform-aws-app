@@ -524,3 +524,9 @@ variable "ecs_slack_channel" {
   type        = string
   default     = ""
 }
+
+variable "runtime_platform" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_task_definition#runtime_platform"
+  type        = map(string)
+  default     = null
+}
