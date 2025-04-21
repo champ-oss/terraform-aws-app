@@ -107,7 +107,7 @@ resource "aws_iam_role_policy_attachment" "invoke_step_functions_attachment" {
 }
 
 resource "aws_sfn_state_machine" "this" {
-  count = var.enabled && var.enable_ecs_auto_update && var.desired_count > 0 ? 1 : 0
+  count = var.enabled && var.enable_ecs_auto_update && (var.desired_count > 0 || var.min_capacity > 0) ? 1 : 0
   name  = substr("${var.git}-${var.name}", 0, 64)
   tags  = merge(local.tags, var.tags)
   definition = jsonencode({
