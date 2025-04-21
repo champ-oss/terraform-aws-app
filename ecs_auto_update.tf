@@ -1,6 +1,7 @@
 resource "aws_cloudwatch_event_rule" "trigger_step_function" {
-  count = var.enabled && var.enable_ecs_auto_update && (
-    try(var.desired_count, 0) > 0 || try(var.min_capacity, 0) > 0
+  count = var.enabled && var.enable_ecs_auto_update && try(
+    var.desired_count > 0 || var.min_capacity > 0,
+    false
   ) ? 1 : 0
   name_prefix    = var.git
   description    = "Rule to trigger Step Function"
@@ -18,8 +19,9 @@ resource "aws_cloudwatch_event_rule" "trigger_step_function" {
 }
 
 resource "aws_cloudwatch_event_target" "step_function_target" {
-  count = var.enabled && var.enable_ecs_auto_update && (
-    try(var.desired_count, 0) > 0 || try(var.min_capacity, 0) > 0
+  count = var.enabled && var.enable_ecs_auto_update && try(
+    var.desired_count > 0 || var.min_capacity > 0,
+    false
   ) ? 1 : 0
   rule           = aws_cloudwatch_event_rule.trigger_step_function[0].name
   arn            = aws_sfn_state_machine.this[0].arn
@@ -30,8 +32,9 @@ resource "aws_cloudwatch_event_target" "step_function_target" {
 
 # IAM Role for Step Functions
 resource "aws_iam_role" "step_functions_role" {
-  count = var.enabled && var.enable_ecs_auto_update && (
-    try(var.desired_count, 0) > 0 || try(var.min_capacity, 0) > 0
+  count = var.enabled && var.enable_ecs_auto_update && try(
+    var.desired_count > 0 || var.min_capacity > 0,
+    false
   ) ? 1 : 0
   name_prefix = var.git
   tags        = merge(local.tags, var.tags)
@@ -59,8 +62,9 @@ resource "aws_iam_role" "step_functions_role" {
 
 
 resource "aws_iam_role_policy_attachment" "ecs_update_policy" {
-  count = var.enabled && var.enable_ecs_auto_update && (
-    try(var.desired_count, 0) > 0 || try(var.min_capacity, 0) > 0
+  count = var.enabled && var.enable_ecs_auto_update && try(
+    var.desired_count > 0 || var.min_capacity > 0,
+    false
   ) ? 1 : 0
   role       = aws_iam_role.step_functions_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
@@ -68,8 +72,9 @@ resource "aws_iam_role_policy_attachment" "ecs_update_policy" {
 
 # IAM Role for EventBridge to invoke Step Functions
 resource "aws_iam_role" "eventbridge_role" {
-  count = var.enabled && var.enable_ecs_auto_update && (
-    try(var.desired_count, 0) > 0 || try(var.min_capacity, 0) > 0
+  count = var.enabled && var.enable_ecs_auto_update && try(
+    var.desired_count > 0 || var.min_capacity > 0,
+    false
   ) ? 1 : 0
   name_prefix = substr("${var.git}-${var.name}-eventbridge-role", 0, 38)
   tags        = merge(local.tags, var.tags)
@@ -90,8 +95,9 @@ resource "aws_iam_role" "eventbridge_role" {
 
 # Attach policy for EventBridge to invoke Step Functions
 resource "aws_iam_policy" "invoke_step_functions_policy" {
-  count = var.enabled && var.enable_ecs_auto_update && (
-    try(var.desired_count, 0) > 0 || try(var.min_capacity, 0) > 0
+  count = var.enabled && var.enable_ecs_auto_update && try(
+    var.desired_count > 0 || var.min_capacity > 0,
+    false
   ) ? 1 : 0
   name_prefix = "${var.git}-${var.name}-invoke-step-functions-policy"
   description = "Policy to allow EventBridge to invoke Step Functions"
@@ -113,16 +119,18 @@ resource "aws_iam_policy" "invoke_step_functions_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "invoke_step_functions_attachment" {
-  count = var.enabled && var.enable_ecs_auto_update && (
-    try(var.desired_count, 0) > 0 || try(var.min_capacity, 0) > 0
+  count = var.enabled && var.enable_ecs_auto_update && try(
+    var.desired_count > 0 || var.min_capacity > 0,
+    false
   ) ? 1 : 0
   role       = aws_iam_role.eventbridge_role[0].name
   policy_arn = aws_iam_policy.invoke_step_functions_policy[0].arn
 }
 
 resource "aws_sfn_state_machine" "this" {
-  count = var.enabled && var.enable_ecs_auto_update && (
-    try(var.desired_count, 0) > 0 || try(var.min_capacity, 0) > 0
+  count = var.enabled && var.enable_ecs_auto_update && try(
+    var.desired_count > 0 || var.min_capacity > 0,
+    false
   ) ? 1 : 0
   name = substr("${var.git}-${var.name}", 0, 64)
   tags = merge(local.tags, var.tags)
