@@ -9,7 +9,8 @@ resource "aws_appautoscaling_target" "this" {
 
   lifecycle {
     ignore_changes = [
-      tags_all # https://github.com/hashicorp/terraform-provider-aws/issues/31261#issuecomment-2333629562
+      tags,     # https://github.com/hashicorp/terraform-provider-aws/issues/31261#issuecomment-2333629562
+      tags_all, # https://github.com/hashicorp/terraform-provider-aws/issues/31261#issuecomment-2333629562
     ]
   }
 }
