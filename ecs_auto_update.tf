@@ -9,9 +9,8 @@ resource "aws_cloudwatch_event_rule" "trigger_step_function" {
     detail-type = ["ECR Image Action"],
     detail = {
       "action-type" : ["PUSH"],
-      "repository-name" = replace(split(":", var.image)[0], "^.+.amazonaws.com/", ""),
-      image-tag = element(split(":", var.image), 1)
-
+      "repository-name" = [join("/", slice(split("/", split(":", var.image)[0]), 1, length(split("/", split(":", var.image)[0]))))],
+      "image-tag" = element(split(":", var.image), 1),
     }
   })
 }
