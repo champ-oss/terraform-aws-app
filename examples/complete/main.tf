@@ -149,7 +149,7 @@ module "this" {
     cpu_architecture        = "X86_64"
     operating_system_family = "LINUX"
   }
-  enabled                     = var.enabled
+  enabled = var.enabled
   #
   /* stickiness example
   stickiness = [{
