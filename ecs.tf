@@ -62,7 +62,7 @@ resource "aws_ecs_task_definition" "this" {
 }
 
 resource "aws_ecs_service" "this" {
-  count                              = var.enable_load_balancer && var.enabled ? 1 : 0
+  count                              = var.enable_load_balancer && var.enabled && !var.paused ? 1 : 0
   name                               = var.name
   cluster                            = var.cluster
   task_definition                    = aws_ecs_task_definition.this[0].arn
@@ -77,7 +77,7 @@ resource "aws_ecs_service" "this" {
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
 
   load_balancer {
-    target_group_arn = try(aws_lb_target_group.this[0].id, "")
+    target_group_arn = aws_lb_target_group.this[0]
     container_name   = local.container[0].name
     container_port   = var.port
   }
@@ -99,7 +99,7 @@ resource "aws_ecs_service" "this" {
 
 resource "aws_ecs_service" "disabled_load_balancer" {
   depends_on                         = [null_resource.wait_for_ecr]
-  count                              = var.enable_load_balancer == false && var.enabled ? 1 : 0
+  count                              = var.enable_load_balancer == false && var.enabled && !var.paused ? 1 : 0
   name                               = var.name
   cluster                            = var.cluster
   task_definition                    = aws_ecs_task_definition.this[0].arn
