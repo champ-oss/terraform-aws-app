@@ -532,7 +532,7 @@ variable "runtime_platform" {
 }
 
 variable "paused" {
-    description = "Pause resources"
-    type        = bool
-    default     = false
+  description = "Pause resources"
+  type        = bool
+  default     = false
 }

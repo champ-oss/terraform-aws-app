@@ -13,13 +13,13 @@ locals {
       image       = var.image
       essential   = true
       environment = [for key, value in merge(var.environment, local.kms_secrets_sha) : { name = key, value = value }]
-      secrets = !var.paused
-        ? [for key, value in merge(var.secrets, local.kms_ssm) : {
+      secrets = !var.paused ? (
+        [for key, value in merge(var.secrets, local.kms_ssm) : {
           name      = key
           valueFrom = value
         }]
-        : []
-      command     = var.command
+      ) : []
+      command = var.command
       portMappings = [
         {
           containerPort = var.port

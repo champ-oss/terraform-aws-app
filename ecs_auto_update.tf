@@ -80,7 +80,7 @@ resource "aws_iam_role" "eventbridge_role" {
 
 # Attach policy for EventBridge to invoke Step Functions
 resource "aws_iam_policy" "invoke_step_functions_policy" {
-  count       = var.enabled && !var.paused &&  var.enable_ecs_auto_update && try(aws_appautoscaling_target.this[0].min_capacity, 0) > 0 ? 1 : 0
+  count       = var.enabled && !var.paused && var.enable_ecs_auto_update && try(aws_appautoscaling_target.this[0].min_capacity, 0) > 0 ? 1 : 0
   name_prefix = "${var.git}-${var.name}-invoke-step-functions-policy"
   description = "Policy to allow EventBridge to invoke Step Functions"
   policy = jsonencode({
@@ -101,13 +101,13 @@ resource "aws_iam_policy" "invoke_step_functions_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "invoke_step_functions_attachment" {
-  count      = var.enabled && !var.paused &&  var.enable_ecs_auto_update && try(aws_appautoscaling_target.this[0].min_capacity, 0) > 0 ? 1 : 0
+  count      = var.enabled && !var.paused && var.enable_ecs_auto_update && try(aws_appautoscaling_target.this[0].min_capacity, 0) > 0 ? 1 : 0
   role       = aws_iam_role.eventbridge_role[0].name
   policy_arn = aws_iam_policy.invoke_step_functions_policy[0].arn
 }
 
 resource "aws_sfn_state_machine" "this" {
-  count = var.enabled && !var.paused &&  var.enable_ecs_auto_update && try(aws_appautoscaling_target.this[0].min_capacity, 0) > 0 ? 1 : 0
+  count = var.enabled && !var.paused && var.enable_ecs_auto_update && try(aws_appautoscaling_target.this[0].min_capacity, 0) > 0 ? 1 : 0
   name  = substr("${var.git}-${var.name}", 0, 64)
   tags  = merge(local.tags, var.tags)
   definition = jsonencode({
