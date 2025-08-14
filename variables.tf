@@ -530,3 +530,9 @@ variable "runtime_platform" {
   type        = map(string)
   default     = null
 }
+
+variable "paused" {
+    description = "Pause resources"
+    type        = bool
+    default     = false
+}

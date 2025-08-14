@@ -1,5 +1,5 @@
 resource "aws_lb_target_group" "this" {
-  count                = var.enabled ? 1 : 0
+  count                = var.enabled && !var.paused ? 1 : 0
   port                 = var.port
   protocol             = "HTTP"
   vpc_id               = var.vpc_id
@@ -40,7 +40,7 @@ locals {
 }
 
 resource "aws_lb_listener_rule" "this" {
-  count        = var.enable_load_balancer && var.enabled ? local.rule_count : 0
+  count        = var.enable_load_balancer && var.enabled && !var.paused ? local.rule_count : 0
   depends_on   = [aws_lb_target_group.this]
   listener_arn = var.listener_arn
   tags         = merge(local.tags, var.tags)
@@ -107,7 +107,7 @@ resource "aws_lb_listener_rule" "this" {
 }
 
 resource "aws_lb_listener_rule" "public_healthcheck" {
-  count        = var.enable_load_balancer && var.enable_public_healthcheck_rule && var.enabled ? 1 : 0
+  count        = var.enable_load_balancer && !var.paused && var.enable_public_healthcheck_rule && var.enabled ? 1 : 0
   depends_on   = [aws_lb_target_group.this]
   listener_arn = var.listener_arn
   tags         = merge(local.tags, var.tags)

@@ -1,5 +1,5 @@
 resource "aws_appautoscaling_target" "this" {
-  count              = var.enabled ? 1 : 0
+  count              = var.enabled && !var.paused ? 1 : 0
   depends_on         = [aws_ecs_service.this, aws_ecs_service.disabled_load_balancer]
   max_capacity       = var.desired_count != null ? var.desired_count : var.max_capacity
   min_capacity       = var.desired_count != null ? var.desired_count : var.min_capacity
@@ -16,7 +16,7 @@ resource "aws_appautoscaling_target" "this" {
 }
 
 resource "aws_appautoscaling_policy" "this" {
-  count              = var.enabled ? 1 : 0
+  count              = var.enabled && !var.paused ? 1 : 0
   depends_on         = [aws_ecs_service.this, aws_ecs_service.disabled_load_balancer]
   name               = "${var.git}-${var.name}"
   policy_type        = var.autoscaling_policy_type
