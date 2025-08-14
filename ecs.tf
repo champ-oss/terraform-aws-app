@@ -77,7 +77,7 @@ resource "aws_ecs_service" "this" {
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.this[0]
+    target_group_arn = aws_lb_target_group.this[0].id
     container_name   = local.container[0].name
     container_port   = var.port
   }
