@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_metric_alarm" "cpu_avg_utilization" {
-  count = var.enabled && var.metric_alarms_enabled ? 1 : 0
+  count = var.enabled && var.metric_alarms_enabled && !var.paused ? 1 : 0
 
   alarm_name          = "/${var.cluster}/${var.name}/cpu-avg-utilization"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -20,7 +20,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_avg_utilization" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "memory_avg_utilization" {
-  count = var.enabled && var.metric_alarms_enabled ? 1 : 0
+  count = var.enabled && var.metric_alarms_enabled && !var.paused ? 1 : 0
 
   alarm_name          = "/${var.cluster}/${var.name}/memory-avg-utilization"
   comparison_operator = "GreaterThanOrEqualToThreshold"

@@ -11,13 +11,13 @@ locals {
 }
 
 resource "random_password" "healthcheck" {
-  count   = var.enable_public_healthcheck_rule && var.enabled ? 1 : 0
+  count   = var.enable_public_healthcheck_rule && var.enabled && !var.paused ? 1 : 0
   length  = 32
   special = false
 }
 
 resource "null_resource" "wait_for_ecr" {
-  count = var.enable_wait_for_ecr && var.enabled ? 1 : 0
+  count = var.enable_wait_for_ecr && var.enabled && !var.paused ? 1 : 0
   triggers = {
     image = var.image
   }

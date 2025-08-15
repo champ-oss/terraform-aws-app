@@ -7,5 +7,5 @@ module "lambda_cloudwatch_alert" {
   filter_pattern = var.filter_pattern
   slack_url      = var.slack_url
   region         = var.alert_region
-  enabled        = var.enabled
+  enabled        = var.enabled && !var.paused
 }
