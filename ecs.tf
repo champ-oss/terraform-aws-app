@@ -31,7 +31,7 @@ locals {
 
         options = {
           awslogs-group         = try(aws_cloudwatch_log_group.this[0].name, "")
-          awslogs-region        = try(data.aws_region.this[0].name, "")
+          awslogs-region        = try(data.aws_region.this[0].region, "")
           awslogs-stream-prefix = "ecs"
         }
       }
