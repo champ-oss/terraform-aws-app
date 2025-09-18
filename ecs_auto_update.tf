@@ -194,24 +194,12 @@ resource "aws_sfn_state_machine" "this" {
               {
                 "Or" : [
                   {
-                    "Variable" : "$.ecsResponse.Services[0].Deployments[0].FailedTasks",
-                    "NumericGreaterThanEquals" : 2
+                    "Variable": "$.ecsResponse.Services[0].Deployments[0].RolloutStateReason",
+                    "StringMatches": "*rolling back*"
                   },
                   {
-                      "Variable": "$.ecsResponse.Services[0].Events[0].Message",
-                      "StringMatches": "*rolling back*",
-                  },
-                  {
-                        "Variable" : "$.ecsResponse.Services[0].Events[0].Message",
-                        "StringMatches" : "*has stopped*"
-                  },
-                  {
-                        "Variable" : "$.ecsResponse.Services[0].Deployments[0].RolloutState",
-                        "StringEquals" : "FAILED"
-                  },
-                  {
-                    "Variable" : "$.ecsResponse.Services[0].Events[0].Message",
-                    "StringMatches" : "*deployment failed*"
+                    "Variable": "$.ecsResponse.Services[0].Deployments[0].RolloutStateReason",
+                    "StringMatches": "*has stopped*"
                   },
                 ]
               }
