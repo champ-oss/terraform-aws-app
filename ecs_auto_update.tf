@@ -198,10 +198,6 @@ resource "aws_sfn_state_machine" "this" {
                     "StringMatches": "*rolling back*"
                   },
                   {
-                    "Variable": "$.ecsResponse.Services[0].Deployments[0].RolloutStateReason",
-                    "StringMatches": "*has stopped*"
-                  },
-                  {
                     "Variable" : "$.ecsResponse.Services[0].Deployments[0].FailedTasks",
                     "NumericGreaterThanEquals" : 2
                   },
