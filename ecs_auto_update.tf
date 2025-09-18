@@ -180,7 +180,7 @@ resource "aws_sfn_state_machine" "this" {
             "And" : [
               { "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status", "StringEquals" : "PRIMARY" },
               { "Variable" : "$.ecsResponse.Services[0].DesiredCount", "NumericEqualsPath" : "$.ecsResponse.Services[0].RunningCount" },
-              { "Variable" : "$.ecsResponse.Services[0].Deployments[0].FailedTasks", "NumericEquals" : 0 },
+              { Variable : "$.ecsResponse.Services[0].Deployments[0].RolloutState", StringEquals : "COMPLETED" },
               { "Variable" : "$.ecsResponse.Services[0].Deployments[1]", "IsPresent" : false }
             ],
             "Next" : "SendSuccessNotification"
