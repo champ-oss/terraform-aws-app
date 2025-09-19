@@ -180,7 +180,7 @@ resource "aws_sfn_state_machine" "this" {
             "And" : [
               { "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status", "StringEquals" : "PRIMARY" },
               { "Variable" : "$.ecsResponse.Services[0].DesiredCount", "NumericEqualsPath" : "$.ecsResponse.Services[0].RunningCount" },
-              { "Variable" : "$.ecsResponse.Services[0].Deployments[0].FailedTasks", "NumericEquals" : 0 },
+              { Variable : "$.ecsResponse.Services[0].Deployments[0].RolloutState", StringEquals : "COMPLETED" },
               { "Variable" : "$.ecsResponse.Services[0].Deployments[1]", "IsPresent" : false }
             ],
             "Next" : "SendSuccessNotification"
@@ -194,25 +194,13 @@ resource "aws_sfn_state_machine" "this" {
               {
                 "Or" : [
                   {
+                    "Variable": "$.ecsResponse.Services[0].Deployments[0].RolloutStateReason",
+                    "StringMatches": "*rolling back*"
+                  },
+                  {
                     "Variable" : "$.ecsResponse.Services[0].Deployments[0].FailedTasks",
                     "NumericGreaterThanEquals" : 1
                   },
-                  {
-                    "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
-                    "StringEquals" : "ROLLBACK_IN_PROGRESS"
-                  },
-                  {
-                    "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
-                    "StringEquals" : "STOPPED"
-                  },
-                  {
-                    "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
-                    "StringEquals" : "ROLLBACK_FAILED"
-                  },
-                  {
-                    "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
-                    "StringEquals" : "ROLLBACK_COMPLETED"
-                  }
                 ]
               }
             ],
