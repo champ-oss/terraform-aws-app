@@ -199,7 +199,7 @@ resource "aws_sfn_state_machine" "this" {
                   },
                   {
                     "Variable" : "$.ecsResponse.Services[0].Deployments[0].FailedTasks",
-                    "NumericGreaterThanEquals" : 2
+                    "NumericGreaterThanEquals" : 1
                   },
                 ]
               }
