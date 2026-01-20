@@ -28,3 +28,8 @@ output "dns_endpoint" {
   description = "output dns endpoint"
   value       = var.enable_route53 && var.enabled && !var.paused ? aws_route53_record.this[0].name : null
 }
+
+output "ecs_service_name" {
+  description = "output service name"
+  value = try(aws_ecs_service.this[0].name, null)
+}
