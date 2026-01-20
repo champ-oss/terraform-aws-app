@@ -30,6 +30,5 @@ output "dns_endpoint" {
 }
 
 output "ecs_service_name" {
-  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service#name"
-  value       = var.enabled && !var.paused ? aws_ecs_service.this[0].name : ""
+  value = try(aws_ecs_service.this[0].name, null)
 }
