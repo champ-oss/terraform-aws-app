@@ -30,5 +30,6 @@ output "dns_endpoint" {
 }
 
 output "ecs_service_name" {
+  description = "output service name"
   value = try(aws_ecs_service.this[0].name, null)
 }
