@@ -26,6 +26,8 @@ locals {
         },
       ]
 
+      readOnlyRootFilesystem =  var.read_only_root_file_system
+
       logConfiguration = {
         logDriver = "awslogs"
 
