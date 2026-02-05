@@ -538,7 +538,7 @@ variable "paused" {
 }
 
 variable "read_only_root_file_system" {
-    description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_task_definition#read_only_root_filesystem"
-    type        = bool
-    default     = false
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_task_definition#read_only_root_filesystem"
+  type        = bool
+  default     = false
 }
