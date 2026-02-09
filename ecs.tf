@@ -8,10 +8,11 @@ locals {
   kms_secrets_sha = { KMS_SECRETS_SHA = sha256(jsonencode(var.kms_secrets)) }
 
   container = [
-    {
+   {
       name        = "this"
       image       = var.image
       essential   = true
+      readOnlyRootFilesystem = var.read_only_root_file_system
       environment = [for key, value in merge(var.environment, local.kms_secrets_sha) : { name = key, value = value }]
       secrets = !var.paused ? (
         [for key, value in merge(var.secrets, local.kms_ssm) : {
