@@ -9,7 +9,7 @@ if [ "$ENABLED" = "true" ]; then
 
   curl -s https://$DNS_NAME/ | grep "Hello world"
   
-  sleep 1800
+  sleep 900
    
 else
   echo "Module is disabled, no resources created for this test"
