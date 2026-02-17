@@ -176,6 +176,7 @@ module "this" {
   max_capacity                       = 10
   scale_in_cooldown                  = 30
   scale_out_cooldown                 = 30
+  read_only_root_file_system         = true
 
   environment = {
     this  = "that"
