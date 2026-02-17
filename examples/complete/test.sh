@@ -9,7 +9,7 @@ if [ "$ENABLED" = "true" ]; then
 
   curl -s https://$DNS_NAME/ | grep "Hello world"
 
-  ## Add sleep
+  ### Add sleep
   
   sleep 900
    
