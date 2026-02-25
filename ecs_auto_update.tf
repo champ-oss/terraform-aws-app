@@ -106,160 +106,74 @@ resource "aws_iam_role_policy_attachment" "invoke_step_functions_attachment" {
   policy_arn = aws_iam_policy.invoke_step_functions_policy[0].arn
 }
 
+
 resource "aws_sfn_state_machine" "this" {
-  count = var.enabled && !var.paused && var.enable_ecs_auto_update && try(aws_appautoscaling_target.this[0].min_capacity, 0) > 0 ? 1 : 0
-  name  = substr("${var.git}-${var.name}", 0, 64)
-  tags  = merge(local.tags, var.tags)
+  count    = var.enabled && !var.paused && var.enable_ecs_auto_update && try(aws_appautoscaling_target.this[0].min_capacity, 0) > 0 ? 1 : 0
+  name     = substr("${var.git}-${var.name}", 0, 64)
+  role_arn = aws_iam_role.step_functions_role[0].arn
+
   definition = jsonencode({
-    "Comment" : "State machine to update ECS service on new ECR image push",
-    "StartAt" : "UpdateECSService",
-    "States" : {
-      "UpdateECSService" : {
-        "Type" : "Task",
-        "Resource" : "arn:aws:states:::aws-sdk:ecs:updateService",
-        "Parameters" : {
-          "Cluster" : var.cluster,
-          "Service" : try(aws_ecs_service.this[0].name, ""),
-          "ForceNewDeployment" : true
+    "Comment" = "Update ECS service and wait for stable deployment",
+    "StartAt" = "UpdateECSService",
+    "States" = {
+
+      "UpdateECSService" = {
+        "Type"     = "Task",
+        "Resource" = "arn:aws:states:::aws-sdk:ecs:updateService",
+        "Parameters" = {
+          "Cluster"            = var.cluster,
+          "Service"            = try(aws_ecs_service.this[0].name, ""),
+          "ForceNewDeployment" = true
         },
-        "Retry" : [
+        "Next" = "WaitForStability"
+      },
+
+      "WaitForStability" = {
+        "Type"           = "Task",
+        "Resource"       = "arn:aws:states:::aws-sdk:ecs:waitUntilServicesStable",
+        "TimeoutSeconds" = 900,
+        "Parameters" = {
+          "Cluster"  = var.cluster,
+          "Services" = [try(aws_ecs_service.this[0].name, "")]
+        },
+        "Next" = "SendSuccessNotification",
+        "Catch" = [
           {
-            "ErrorEquals" : ["ECS.ServiceUpdateException"],
-            "IntervalSeconds" : 5,
-            "MaxAttempts" : 3,
-            "BackoffRate" : 2.0
+            "ErrorEquals" = ["States.ALL"],
+            "Next"        = "SendFailureNotification"
           }
-        ],
-        "Next" : "WaitForServiceStabilization"
+        ]
       },
-      "WaitForServiceStabilization" : {
-        "Type" : "Wait",
-        "Seconds" : 30,
-        "Next" : "CheckIfFirstRetry"
-      },
-      "CheckIfFirstRetry" : {
-        "Type" : "Choice",
-        "Choices" : [
-          {
-            "Variable" : "$.RetryData.retryCount",
-            "IsPresent" : true,
-            "Next" : "CheckServiceStatus"
-          }
-        ],
-        "Default" : "InitializeRetry"
-      },
-      "InitializeRetry" : {
-        "Type" : "Pass",
-        "Result" : { "RetryData" : { "retryCount" : 0 } },
-        "ResultPath" : "$",
-        "Next" : "CheckServiceStatus"
-      },
-      "CheckServiceStatus" : {
-        "Type" : "Task",
-        "Resource" : "arn:aws:states:::aws-sdk:ecs:describeServices",
-        "Parameters" : {
-          "Cluster" : var.cluster,
-          "Services" : [try(aws_ecs_service.this[0].name, "")]
+
+      "SendSuccessNotification" = {
+        "Type"     = "Task",
+        "Resource" = "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
+        "Parameters" = {
+          "status"            = "SUCCESS",
+          "repository-name.$" = "$$.Execution.Input.repository-name",
+          "image-tag.$"       = "$$.Execution.Input.image-tag",
+          "service-name"      = try(aws_ecs_service.this[0].name, ""),
+          "cluster-name"      = var.cluster,
+          "ecs-slack-channel" = var.ecs_slack_channel,
+          "image-digest.$"    = "$$.Execution.Input.image-digest"
         },
-        "ResultPath" : "$.ecsResponse",
-        "Next" : "MergeRetryData"
+        "End" = true
       },
-      "MergeRetryData" : {
-        "Type" : "Pass",
-        "Parameters" : {
-          "RetryData.$" : "$.RetryData",
-          "ecsResponse.$" : "$.ecsResponse"
+
+      "SendFailureNotification" = {
+        "Type"     = "Task",
+        "Resource" = "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
+        "Parameters" = {
+          "status"            = "FAILED",
+          "repository-name.$" = "$$.Execution.Input.repository-name",
+          "image-tag.$"       = "$$.Execution.Input.image-tag",
+          "service-name"      = try(aws_ecs_service.this[0].name, ""),
+          "cluster-name"      = var.cluster,
+          "ecs-slack-channel" = var.ecs_slack_channel,
+          "image-digest.$"    = "$$.Execution.Input.image-digest"
         },
-        "ResultPath" : "$",
-        "Next" : "EvaluateServiceStatus"
-      },
-      "EvaluateServiceStatus" : {
-        "Type" : "Choice",
-        "Choices" : [
-          {
-            "And" : [
-              { "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status", "StringEquals" : "PRIMARY" },
-              { "Variable" : "$.ecsResponse.Services[0].DesiredCount", "NumericEqualsPath" : "$.ecsResponse.Services[0].RunningCount" },
-              { Variable : "$.ecsResponse.Services[0].Deployments[0].RolloutState", StringEquals : "COMPLETED" },
-              { "Variable" : "$.ecsResponse.Services[0].Deployments[1]", "IsPresent" : false }
-            ],
-            "Next" : "SendSuccessNotification"
-          },
-          {
-            "And" : [
-              {
-                "Variable" : "$.ecsResponse.Services[0].Deployments[0].Status",
-                "StringEquals" : "PRIMARY"
-              },
-              {
-                "Or" : [
-                  {
-                    "Variable": "$.ecsResponse.Services[0].Deployments[0].RolloutStateReason",
-                    "StringMatches": "*rolling back*"
-                  },
-                  {
-                    "Variable" : "$.ecsResponse.Services[0].Deployments[0].FailedTasks",
-                    "NumericGreaterThanEquals" : 1
-                  },
-                ]
-              }
-            ],
-            "Next" : "SendFailureNotification"
-          }
-        ],
-        "Default" : "CheckRetryCount"
-      },
-      "CheckRetryCount" : {
-        "Type" : "Choice",
-        "Choices" : [
-          {
-            "Variable" : "$.RetryData.retryCount",
-            "NumericGreaterThanEquals" : 20,
-            "Next" : "SendFailureNotification"
-          }
-        ],
-        "Default" : "IncrementRetryCount"
-      },
-      "IncrementRetryCount" : {
-        "Type" : "Pass",
-        "Parameters" : {
-          "RetryData" : {
-            "retryCount.$" : "States.MathAdd($.RetryData.retryCount, 1)"
-          },
-          "ecsResponse.$" : "$.ecsResponse"
-        },
-        "ResultPath" : "$",
-        "Next" : "WaitForServiceStabilization"
-      },
-      "SendSuccessNotification" : {
-        "Type" : "Task",
-        "Resource" : "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
-        "Parameters" : {
-          "status" : "SUCCESS",
-          "repository-name.$" : "$$.Execution.Input.repository-name",
-          "image-tag.$" : "$$.Execution.Input.image-tag",
-          "service-name" : try(aws_ecs_service.this[0].name, ""),
-          "cluster-name" : var.cluster,
-          "ecs-slack-channel" : var.ecs_slack_channel,
-          "image-digest.$" : "$$.Execution.Input.image-digest"
-        },
-        "End" : true
-      },
-      "SendFailureNotification" : {
-        "Type" : "Task",
-        "Resource" : "arn:aws:lambda:${data.aws_region.this[0].name}:${data.aws_caller_identity.this[0].account_id}:function:${var.ecs_slack_notification_lambda}",
-        "Parameters" : {
-          "status" : "FAILED",
-          "repository-name.$" : "$$.Execution.Input.repository-name",
-          "image-tag.$" : "$$.Execution.Input.image-tag",
-          "service-name" : try(aws_ecs_service.this[0].name, ""),
-          "cluster-name" : var.cluster,
-          "ecs-slack-channel" : var.ecs_slack_channel,
-          "image-digest.$" : "$$.Execution.Input.image-digest"
-        },
-        "End" : true
+        "End" = true
       }
     }
   })
-  role_arn = aws_iam_role.step_functions_role[0].arn
 }
