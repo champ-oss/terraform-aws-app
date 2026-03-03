@@ -134,7 +134,7 @@ resource "aws_sfn_state_machine" "this" {
       },
       "WaitForServiceStabilization" : {
         "Type" : "Wait",
-        "Seconds" : 30,
+        "Seconds" : 15,
         "Next" : "CheckIfFirstRetry"
       },
       "CheckIfFirstRetry" : {
@@ -194,13 +194,9 @@ resource "aws_sfn_state_machine" "this" {
               {
                 "Or" : [
                   {
-                    "Variable": "$.ecsResponse.Services[0].Deployments[0].RolloutStateReason",
-                    "StringMatches": "*rolling back*"
-                  },
-                  {
-                    "Variable" : "$.ecsResponse.Services[0].Deployments[0].FailedTasks",
-                    "NumericGreaterThanEquals" : 1
-                  },
+                    "Variable" : "$.ecsResponse.Services[0].Deployments[0].RolloutStateReason",
+                    "StringMatches" : "*rolling back*"
+                  }
                 ]
               }
             ],
@@ -214,7 +210,7 @@ resource "aws_sfn_state_machine" "this" {
         "Choices" : [
           {
             "Variable" : "$.RetryData.retryCount",
-            "NumericGreaterThanEquals" : 20,
+            "NumericGreaterThanEquals" : 40,
             "Next" : "SendFailureNotification"
           }
         ],

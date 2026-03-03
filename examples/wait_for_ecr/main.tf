@@ -130,7 +130,7 @@ module "wait_ecr" {
   name                              = "with_lb"
   dns_name                          = "${local.git}.${data.aws_route53_zone.this.name}"
   image                             = "${data.aws_caller_identity.this.account_id}.dkr.ecr.us-east-2.amazonaws.com/terraform-aws-app:latest"
-  enable_ecs_auto_update            = true
+  enable_ecs_auto_update            = false
   healthcheck                       = "/ping"
   port                              = 8080
   health_check_grace_period_seconds = 5
