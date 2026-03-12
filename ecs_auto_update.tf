@@ -119,7 +119,8 @@ resource "aws_sfn_state_machine" "this" {
         "Resource" : "arn:aws:states:::aws-sdk:ecs:updateService",
         "Parameters" : {
           "Cluster" : var.cluster,
-          "Service" : try(aws_ecs_service.this[0].name, ""),
+          # update service for load balancer and non-load balancer use cases
+          "Service" : var.enable_load_balancer ? try(aws_ecs_service.this[0].name, "") : try(aws_ecs_service.disabled_load_balancer[0].name, ""),
           "ForceNewDeployment" : true
         },
         "Retry" : [
@@ -159,7 +160,7 @@ resource "aws_sfn_state_machine" "this" {
         "Resource" : "arn:aws:states:::aws-sdk:ecs:describeServices",
         "Parameters" : {
           "Cluster" : var.cluster,
-          "Services" : [try(aws_ecs_service.this[0].name, "")]
+          "Services" : var.enable_load_balancer ? [try(aws_ecs_service.this[0].name, "")] : [try(aws_ecs_service.disabled_load_balancer[0].name, "")],
         },
         "ResultPath" : "$.ecsResponse",
         "Next" : "MergeRetryData"
@@ -234,7 +235,7 @@ resource "aws_sfn_state_machine" "this" {
           "status" : "SUCCESS",
           "repository-name.$" : "$$.Execution.Input.repository-name",
           "image-tag.$" : "$$.Execution.Input.image-tag",
-          "service-name" : try(aws_ecs_service.this[0].name, ""),
+          "service-name" : var.enable_load_balancer ? try(aws_ecs_service.this[0].name, "") : try(aws_ecs_service.disabled_load_balancer[0].name, ""),
           "cluster-name" : var.cluster,
           "ecs-slack-channel" : var.ecs_slack_channel,
           "image-digest.$" : "$$.Execution.Input.image-digest"
@@ -248,7 +249,7 @@ resource "aws_sfn_state_machine" "this" {
           "status" : "FAILED",
           "repository-name.$" : "$$.Execution.Input.repository-name",
           "image-tag.$" : "$$.Execution.Input.image-tag",
-          "service-name" : try(aws_ecs_service.this[0].name, ""),
+          "service-name" : var.enable_load_balancer ? try(aws_ecs_service.this[0].name, "") : try(aws_ecs_service.disabled_load_balancer[0].name, ""),
           "cluster-name" : var.cluster,
           "ecs-slack-channel" : var.ecs_slack_channel,
           "image-digest.$" : "$$.Execution.Input.image-digest"
