@@ -119,7 +119,6 @@ resource "aws_sfn_state_machine" "this" {
         "Resource" : "arn:aws:states:::aws-sdk:ecs:updateService",
         "Parameters" : {
           "Cluster" : var.cluster,
-          # update service for load balancer and non-load balancer use cases
           "Service" : var.enable_load_balancer ? try(aws_ecs_service.this[0].name, "") : try(aws_ecs_service.disabled_load_balancer[0].name, ""),
           "ForceNewDeployment" : true
         },
