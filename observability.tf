@@ -10,6 +10,7 @@ resource "aws_cloudwatch_event_rule" "ecs_deployment" {
     "detail-type" = ["ECS Deployment State Change"],
     detail = {
       rolloutState = ["COMPLETED", "FAILED"]
+      serviceName = [var.enable_load_balancer ? try(aws_ecs_service.this[0].name, "") : try(aws_ecs_service.disabled_load_balancer[0].name, "")]
     }
   })
 }
