@@ -6,7 +6,7 @@ resource "aws_cloudwatch_event_rule" "ecs_deployment" {
   tags           = merge(local.tags, var.tags)
 
   event_pattern = jsonencode({
-    source      = ["aws.ecs"],
+    source        = ["aws.ecs"],
     "detail-type" = ["ECS Deployment State Change"],
     detail = {
       rolloutState = ["COMPLETED", "FAILED"]
@@ -15,11 +15,15 @@ resource "aws_cloudwatch_event_rule" "ecs_deployment" {
 }
 
 resource "aws_cloudwatch_event_target" "send_to_central_bus" {
-  count          = var.enabled && !var.paused && var.enable_ecs_observability ? 1 : 0
-  rule           = aws_cloudwatch_event_rule.ecs_deployment[0].name
-  arn            = var.central_bus  # Central bus ARN
-  role_arn       = aws_iam_role.eventbridge_cross_account[0].arn
-  input_path     = "$.detail"       # only send deployment detail
+  count      = var.enabled && !var.paused && var.enable_ecs_observability ? 1 : 0
+  rule       = aws_cloudwatch_event_rule.ecs_deployment[0].name
+  arn        = var.central_bus # Central bus ARN
+  role_arn   = aws_iam_role.eventbridge_cross_account[0].arn
+  input_path = "$.detail" # only send deployment detail
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_iam_role" "eventbridge_cross_account" {
