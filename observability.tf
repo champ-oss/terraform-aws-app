@@ -7,19 +7,24 @@ resource "aws_cloudwatch_event_rule" "ecs_deployment" {
 
   event_pattern = jsonencode({
     source        = ["aws.ecs"],
-    "detail-type" = ["ECS Deployment State Change"],
+    "detail-type" = ["ECS Task State Change"],
     detail = {
-      rolloutState = ["COMPLETED", "FAILED"]
-      serviceName = [var.enable_load_balancer ? try(aws_ecs_service.this[0].name, "") : try(aws_ecs_service.disabled_load_balancer[0].name, "")]
+      "group" : [{
+        "suffix" : var.enable_load_balancer ? try(aws_ecs_service.this[0].name, "") : try(aws_ecs_service.disabled_load_balancer[0].name, "")
+      }],
+      "clusterArn" : [{
+        "suffix" : var.cluster
+      }],
+      "lastStatus" : ["RUNNING"]
     }
   })
 }
 
 resource "aws_cloudwatch_event_target" "send_to_central_bus" {
-  count      = var.enabled && !var.paused && var.enable_ecs_observability ? 1 : 0
-  rule       = aws_cloudwatch_event_rule.ecs_deployment[0].name
-  arn        = var.central_bus  # central bus ARN
-  role_arn   = aws_iam_role.eventbridge_cross_account[0].arn
+  count    = var.enabled && !var.paused && var.enable_ecs_observability ? 1 : 0
+  rule     = aws_cloudwatch_event_rule.ecs_deployment[0].name
+  arn      = var.central_bus # central bus ARN
+  role_arn = aws_iam_role.eventbridge_cross_account[0].arn
 }
 
 resource "aws_iam_role" "eventbridge_cross_account" {
