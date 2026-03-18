@@ -542,3 +542,15 @@ variable "read_only_root_file_system" {
   type        = bool
   default     = null
 }
+
+variable "enable_ecs_observability" {
+  description = "Enable ECS observability with CloudWatch Container Insights"
+  type        = bool
+  default     = false
+}
+
+variable "central_bus" {
+  description = "ARN of the central EventBridge bus to send ECS deployment events to. Required if enable_ecs_observability is true."
+  type        = string
+  default     = ""
+}
