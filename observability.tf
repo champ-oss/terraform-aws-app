@@ -15,6 +15,7 @@ resource "aws_cloudwatch_event_rule" "ecs_deployment" {
       "clusterArn" : [{
         "suffix" : var.cluster
       }],
+      "desiredStatus" : ["RUNNING"],
       "lastStatus" : ["RUNNING"]
     }
   })
