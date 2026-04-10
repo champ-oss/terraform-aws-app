@@ -89,11 +89,11 @@ resource "aws_lb_listener_rule" "this" {
     target_group_arn = aws_lb_target_group.this[0].arn
   }
 
-  #condition {
-  #  host_header {
-  #    values = var.enable_authenticate_oidc ? ["*"] : [var.dns_name]
-  #  }
-  #}
+  condition {
+    path_pattern {
+      values = ["/*"]
+    }
+  }
 
   dynamic "condition" {
     for_each = length(var.source_ips) > 0 ? [1] : []
