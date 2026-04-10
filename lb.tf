@@ -91,7 +91,7 @@ resource "aws_lb_listener_rule" "this" {
 
   condition {
     host_header {
-      values = [var.dns_name]
+      values = !var.enable_authenticate_cognito ? [var.dns_name] : ["*"]
     }
   }
 
