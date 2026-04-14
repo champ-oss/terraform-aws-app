@@ -557,6 +557,6 @@ variable "central_bus" {
 
 variable "alb_allowed_paths" {
   type = list(string)
-
+  description = "List of allowed paths for the load balancer to forward traffic to. This is used in the load balancer listener rule condition. If empty, it will forward all traffic to the target group."
   default = ["/*"]
 }
