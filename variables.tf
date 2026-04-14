@@ -555,10 +555,8 @@ variable "central_bus" {
   default     = ""
 }
 
-variable "oidc_callback_paths" {
+variable "alb_allowed_paths" {
   type = list(string)
-  default = [
-    "/oauth2/idpresponse",
-    "/oauth2/*"
-  ]
+
+  default = ["/*"]
 }
