@@ -554,3 +554,11 @@ variable "central_bus" {
   type        = string
   default     = ""
 }
+
+variable "oidc_callback_paths" {
+  type = list(string)
+  default = [
+    "/oauth2/idpresponse",
+    "/oauth2/*"
+  ]
+}

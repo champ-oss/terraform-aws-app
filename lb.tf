@@ -39,6 +39,30 @@ locals {
   rule_count = length(local.ip_groups) != 0 ? length(local.ip_groups) : 1
 }
 
+resource "aws_lb_listener_rule" "oidc_callback" {
+  count        = var.enable_load_balancer && var.enabled && var.enable_authenticate_oidc && !var.paused ? 1 : 0
+  listener_arn = var.listener_arn
+  tags         = merge(local.tags, var.tags)
+
+  priority = 1
+
+  condition {
+    path_pattern {
+      values = var.oidc_callback_paths
+    }
+  }
+
+  action {
+    type = "fixed-response"
+
+    fixed_response {
+      status_code  = "200"
+      content_type = "text/plain"
+      message_body = "OK"
+    }
+  }
+}
+
 resource "aws_lb_listener_rule" "this" {
   count        = var.enable_load_balancer && var.enabled && !var.paused ? local.rule_count : 0
   depends_on   = [aws_lb_target_group.this]
