@@ -121,7 +121,7 @@ variable "image" {
 variable "cpu" {
   description = "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html"
   type        = number
-  default     = 1024
+  default     = 512
 }
 
 variable "matcher" {
@@ -133,7 +133,7 @@ variable "matcher" {
 variable "memory" {
   description = "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html"
   type        = number
-  default     = 2048
+  default     = 1024
 }
 
 variable "desired_count" {
