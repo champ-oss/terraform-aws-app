@@ -80,7 +80,7 @@ module "acm" {
 }
 
 module "core" {
-  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.120-d9dede5"
+  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=b1eed160619c97c1271e644078f43b9c8d06f39b"
   git                       = local.git
   name                      = local.git
   vpc_id                    = data.aws_vpcs.this.ids[0]
@@ -145,6 +145,7 @@ module "this" {
   lb_zone_id                  = module.core.lb_public_zone_id
   enable_route53              = true
   enable_route53_health_check = true
+  enable_efs                  = true
   runtime_platform = {
     cpu_architecture        = "X86_64"
     operating_system_family = "LINUX"

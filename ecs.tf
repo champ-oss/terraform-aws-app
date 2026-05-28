@@ -27,6 +27,14 @@ locals {
         },
       ]
 
+     mountPoints = var.enable_efs ? [
+       {
+         sourceVolume  = "efs"
+         containerPath = var.efs_container_path
+         readOnly      = false
+       }
+     ] : []
+
       logConfiguration = {
         logDriver = "awslogs"
 
@@ -50,6 +58,24 @@ resource "aws_ecs_task_definition" "this" {
   network_mode             = "awsvpc"
   cpu                      = var.cpu
   memory                   = var.memory
+
+  dynamic "volume" {
+    for_each = var.enable_efs ? [1] : []
+
+    content {
+      name = "efs"
+
+      efs_volume_configuration {
+        file_system_id     = aws_efs_file_system.this[0].id
+        transit_encryption = "ENABLED"
+
+        authorization_config {
+          access_point_id = aws_efs_access_point.this[0].id
+          iam             = "ENABLED"
+        }
+      }
+    }
+  }
 
   dynamic "runtime_platform" {
     for_each = var.runtime_platform != null ? [1] : []
