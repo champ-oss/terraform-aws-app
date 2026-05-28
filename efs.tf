@@ -17,7 +17,9 @@ resource "aws_security_group" "efs" {
 }
 
 resource "aws_security_group_rule" "efs_from_ecs" {
-  for_each = var.enabled && var.enable_efs ? toset(var.security_groups) : []
+  for_each = var.enabled && var.enable_efs ? {
+    for index, sg_id in var.security_groups : index => sg_id
+  } : {}
 
   type                     = "ingress"
   security_group_id        = aws_security_group.efs[0].id
