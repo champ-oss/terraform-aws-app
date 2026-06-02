@@ -80,18 +80,18 @@ module "acm" {
 }
 
 module "core" {
-  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.120-d9dede5"
-  git                       = local.git
-  name                      = local.git
-  vpc_id                    = data.aws_vpcs.this.ids[0]
-  public_subnet_ids         = data.aws_subnets.public.ids
-  private_subnet_ids        = data.aws_subnets.private.ids
-  protect                   = false
-  log_retention             = "3"
-  tags                      = local.tags
-  certificate_arn           = module.acm.arn
-  enable_container_insights = false
-  enabled                   = var.enabled
+  source                     = "github.com/champ-oss/terraform-aws-core.git?ref=121379d1e9164845e79a9cd67126aabf895e1d59"
+  git                        = local.git
+  name                       = local.git
+  vpc_id                     = data.aws_vpcs.this.ids[0]
+  public_subnet_ids          = data.aws_subnets.public.ids
+  private_subnet_ids         = data.aws_subnets.private.ids
+  enable_deletion_protection = false
+  log_retention              = "3"
+  tags                       = local.tags
+  certificate_arn            = module.acm.arn
+  enable_container_insights  = false
+  enabled                    = var.enabled
 }
 
 module "kms" {
@@ -145,6 +145,7 @@ module "this" {
   lb_zone_id                  = module.core.lb_public_zone_id
   enable_route53              = true
   enable_route53_health_check = true
+  enable_efs                  = true
   runtime_platform = {
     cpu_architecture        = "X86_64"
     operating_system_family = "LINUX"

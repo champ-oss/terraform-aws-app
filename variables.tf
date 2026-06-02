@@ -554,3 +554,21 @@ variable "central_bus" {
   type        = string
   default     = ""
 }
+
+variable "enable_efs" {
+  description = "Enable EFS volume for ECS tasks"
+  type    = bool
+  default = false
+}
+
+variable "efs_container_path" {
+  description = "Mount path inside the container for the EFS volume"
+  type    = string
+  default = "/data"
+}
+
+variable "efs_root_directory" {
+  description = "Root directory within the EFS file system to mount. If not specified, the entire file system will be mounted."
+  type    = string
+  default = "/app"
+}
