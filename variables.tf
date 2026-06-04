@@ -572,3 +572,12 @@ variable "efs_root_directory" {
   type    = string
   default = "/app"
 }
+
+variable "efs_posix_user" {
+  type = object({
+    uid = number
+    gid = number
+  })
+
+  default = null
+}

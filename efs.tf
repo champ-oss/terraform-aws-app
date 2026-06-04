@@ -45,15 +45,19 @@ resource "aws_efs_access_point" "this" {
     path = var.efs_root_directory
 
     creation_info {
-      owner_uid   = 1000
-      owner_gid   = 1000
+      owner_uid   = var.efs_posix_user != null ? var.efs_posix_user.uid : 0
+      owner_gid   = var.efs_posix_user != null ? var.efs_posix_user.gid : 0
       permissions = "0755"
     }
   }
 
-  posix_user {
-    uid = 1000
-    gid = 1000
+  dynamic "posix_user" {
+    for_each = var.efs_posix_user != null ? [1] : []
+
+    content {
+      uid = var.efs_posix_user.uid
+      gid = var.efs_posix_user.gid
+    }
   }
 
   tags = merge(local.tags, var.tags)
