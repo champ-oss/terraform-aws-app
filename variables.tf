@@ -561,6 +561,12 @@ variable "enable_efs" {
   default = false
 }
 
+variable "efs_container_path" {
+  description = "Mount path inside the container for the EFS volume"
+  type    = string
+  default = "/data"
+}
+
 variable "efs_access_points" {
   type = list(object({
     path        = string
