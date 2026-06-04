@@ -146,6 +146,14 @@ module "this" {
   enable_route53              = true
   enable_route53_health_check = true
   enable_efs                  = true
+  efs_access_points = [
+    {
+      path         = "/"
+      owner_uid    = 1000
+      owner_gid    = 1000
+      permissions  = "755"
+    }
+  ]
   runtime_platform = {
     cpu_architecture        = "X86_64"
     operating_system_family = "LINUX"

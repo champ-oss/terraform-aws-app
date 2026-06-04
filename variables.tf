@@ -561,14 +561,15 @@ variable "enable_efs" {
   default = false
 }
 
-variable "efs_container_path" {
-  description = "Mount path inside the container for the EFS volume"
-  type    = string
-  default = "/data"
-}
+variable "efs_access_points" {
+  type = list(object({
+    path        = string
+    owner_uid   = optional(number, 0)
+    owner_gid   = optional(number, 0)
+    permissions = optional(string, "0755")
+    posix_uid   = optional(number)
+    posix_gid   = optional(number)
+  }))
 
-variable "efs_root_directory" {
-  description = "Root directory within the EFS file system to mount. If not specified, the entire file system will be mounted."
-  type    = string
-  default = "/app"
+  default = []
 }

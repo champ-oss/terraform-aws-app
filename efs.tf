@@ -38,22 +38,32 @@ resource "aws_efs_mount_target" "this" {
 }
 
 resource "aws_efs_access_point" "this" {
-  count          = var.enabled && var.enable_efs ? 1 : 0
+  for_each = var.enabled && var.enable_efs ? {
+    for ap in var.efs_access_points : ap.path => ap
+  } : {}
+
   file_system_id = aws_efs_file_system.this[0].id
 
   root_directory {
-    path = var.efs_root_directory
+    path = each.value.path
 
     creation_info {
-      owner_uid   = 1000
-      owner_gid   = 1000
-      permissions = "0755"
+      owner_uid   = each.value.owner_uid
+      owner_gid   = each.value.owner_gid
+      permissions = each.value.permissions
     }
   }
 
-  posix_user {
-    uid = 1000
-    gid = 1000
+  dynamic "posix_user" {
+    for_each = (
+    each.value.posix_uid != null &&
+    each.value.posix_gid != null
+    ) ? [1] : []
+
+    content {
+      uid = each.value.posix_uid
+      gid = each.value.posix_gid
+    }
   }
 
   tags = merge(local.tags, var.tags)
