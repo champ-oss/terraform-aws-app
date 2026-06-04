@@ -70,7 +70,7 @@ resource "aws_ecs_task_definition" "this" {
         transit_encryption = "ENABLED"
 
         authorization_config {
-          access_point_id = aws_efs_access_point.this[0].id
+          access_point_id = one(values(aws_efs_access_point.this)).id
           iam             = "ENABLED"
         }
       }
