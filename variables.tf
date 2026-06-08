@@ -562,6 +562,7 @@ variable "enable_efs" {
 }
 
 variable "efs_mounts" {
+  description = "List of EFS mounts to create and attach to ECS task definition"
   type = list(object({
     path           = string
     container_path = string
