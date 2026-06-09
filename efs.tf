@@ -33,27 +33,34 @@ resource "aws_efs_mount_target" "this" {
   for_each = var.enabled && var.enable_efs ? toset(var.subnets) : []
 
   file_system_id  = aws_efs_file_system.this[0].id
-  subnet_id        = each.value
-  security_groups  = [aws_security_group.efs[0].id]
+  subnet_id       = each.value
+  security_groups = [aws_security_group.efs[0].id]
 }
 
 resource "aws_efs_access_point" "this" {
-  count          = var.enabled && var.enable_efs ? 1 : 0
+  for_each = var.enabled && var.enable_efs ? {
+    for mount in var.efs_mounts : mount.path => mount
+  } : {}
+
   file_system_id = aws_efs_file_system.this[0].id
 
   root_directory {
-    path = var.efs_root_directory
+    path = each.value.path
 
     creation_info {
-      owner_uid   = 1000
-      owner_gid   = 1000
+      owner_uid   = try(each.value.user.uid, 0)
+      owner_gid   = try(each.value.user.gid, 0)
       permissions = "0755"
     }
   }
 
-  posix_user {
-    uid = 1000
-    gid = 1000
+  dynamic "posix_user" {
+    for_each = try(each.value.user, null) != null ? [each.value.user] : []
+
+    content {
+      uid = posix_user.value.uid
+      gid = posix_user.value.gid
+    }
   }
 
   tags = merge(local.tags, var.tags)

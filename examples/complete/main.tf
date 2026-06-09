@@ -146,6 +146,17 @@ module "this" {
   enable_route53              = true
   enable_route53_health_check = true
   enable_efs                  = true
+  efs_mounts = [
+    {
+      path           = "/app"
+      container_path = "/data"
+
+      user = {
+        uid = 1000
+        gid = 1000
+      }
+    }
+  ]
   runtime_platform = {
     cpu_architecture        = "X86_64"
     operating_system_family = "LINUX"

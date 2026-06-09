@@ -7,13 +7,18 @@ locals {
   # service to cycle any time KMS values are updated.
   kms_secrets_sha = { KMS_SECRETS_SHA = sha256(jsonencode(var.kms_secrets)) }
 
+  efs_volume_names = {
+    for mount in var.efs_mounts :
+    mount.path => "efs-${replace(trimprefix(mount.path, "/"), "/", "-")}"
+  }
+
   container = [
-   {
-      name        = "this"
-      image       = var.image
-      essential   = true
+    {
+      name                   = "this"
+      image                  = var.image
+      essential              = true
       readOnlyRootFilesystem = var.read_only_root_file_system
-      environment = [for key, value in merge(var.environment, local.kms_secrets_sha) : { name = key, value = value }]
+      environment            = [for key, value in merge(var.environment, local.kms_secrets_sha) : { name = key, value = value }]
       secrets = !var.paused ? (
         [for key, value in merge(var.secrets, local.kms_ssm) : {
           name      = key
@@ -27,13 +32,13 @@ locals {
         },
       ]
 
-     mountPoints = var.enable_efs ? [
-       {
-         sourceVolume  = "efs"
-         containerPath = var.efs_container_path
-         readOnly      = false
-       }
-     ] : []
+      mountPoints = var.enable_efs ? [
+        for mount in var.efs_mounts : {
+          sourceVolume  = local.efs_volume_names[mount.path]
+          containerPath = mount.container_path
+          readOnly      = mount.read_only
+        }
+      ] : []
 
       logConfiguration = {
         logDriver = "awslogs"
@@ -60,17 +65,19 @@ resource "aws_ecs_task_definition" "this" {
   memory                   = var.memory
 
   dynamic "volume" {
-    for_each = var.enable_efs ? [1] : []
+    for_each = var.enable_efs ? {
+      for mount in var.efs_mounts : mount.path => mount
+    } : {}
 
     content {
-      name = "efs"
+      name = local.efs_volume_names[volume.value.path]
 
       efs_volume_configuration {
         file_system_id     = aws_efs_file_system.this[0].id
         transit_encryption = "ENABLED"
 
         authorization_config {
-          access_point_id = aws_efs_access_point.this[0].id
+          access_point_id = aws_efs_access_point.this[volume.value.path].id
           iam             = "ENABLED"
         }
       }
