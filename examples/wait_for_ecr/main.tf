@@ -90,18 +90,18 @@ module "acm" {
 }
 
 module "core" {
-  source                    = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.133-cbe2b51"
-  git                       = local.git
-  name                      = local.git
-  vpc_id                    = data.aws_vpcs.this.ids[0]
-  public_subnet_ids         = data.aws_subnets.public.ids
-  private_subnet_ids        = data.aws_subnets.private.ids
-  protect                   = false
-  log_retention             = "3"
-  tags                      = local.tags
-  certificate_arn           = module.acm.arn
-  enable_container_insights = false
-  enabled                   = var.enabled
+  source                     = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.133-cbe2b51"
+  git                        = local.git
+  name                       = local.git
+  vpc_id                     = data.aws_vpcs.this.ids[0]
+  public_subnet_ids          = data.aws_subnets.public.ids
+  private_subnet_ids         = data.aws_subnets.private.ids
+  enable_deletion_protection = false
+  log_retention              = "3"
+  tags                       = local.tags
+  certificate_arn            = module.acm.arn
+  enable_container_insights  = false
+  enabled                    = var.enabled
 }
 
 module "kms" {
