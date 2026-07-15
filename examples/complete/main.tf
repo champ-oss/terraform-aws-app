@@ -80,7 +80,7 @@ module "acm" {
 }
 
 module "core" {
-  source                     = "github.com/champ-oss/terraform-aws-core.git?ref=121379d1e9164845e79a9cd67126aabf895e1d59"
+  source                     = "github.com/champ-oss/terraform-aws-core.git?ref=v1.0.133-cbe2b51"
   git                        = local.git
   name                       = local.git
   vpc_id                     = data.aws_vpcs.this.ids[0]

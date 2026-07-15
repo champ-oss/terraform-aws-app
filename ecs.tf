@@ -109,6 +109,7 @@ resource "aws_ecs_service" "this" {
   enable_execute_command             = var.enable_execute_command
   deployment_maximum_percent         = var.deployment_maximum_percent
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
+  availability_zone_rebalancing      = var.availability_zone_rebalancing
 
   load_balancer {
     target_group_arn = aws_lb_target_group.this[0].id
@@ -144,6 +145,7 @@ resource "aws_ecs_service" "disabled_load_balancer" {
   enable_execute_command             = var.enable_execute_command
   deployment_maximum_percent         = var.deployment_maximum_percent
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
+  availability_zone_rebalancing      = var.availability_zone_rebalancing
 
   network_configuration {
     security_groups = var.security_groups
