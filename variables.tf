@@ -576,3 +576,9 @@ variable "efs_mounts" {
 
   default = []
 }
+
+variable "availability_zone_rebalancing" {
+  description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service#availability_zone_rebalancing-1"
+  type        = string
+  default     = null
+}
