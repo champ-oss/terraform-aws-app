@@ -582,3 +582,13 @@ variable "availability_zone_rebalancing" {
   type        = string
   default     = null
 }
+
+variable "enable_path_routing" {
+  type    = bool
+  default = false
+}
+
+variable "path_patterns" {
+  type    = list(string)
+  default = []
+}
