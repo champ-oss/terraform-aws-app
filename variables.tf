@@ -582,3 +582,15 @@ variable "availability_zone_rebalancing" {
   type        = string
   default     = null
 }
+
+variable "enable_path_routing" {
+  description = "Enable path routing for the load balancer"
+  type    = bool
+  default = false
+}
+
+variable "path_patterns" {
+  description = "List of path patterns for the load balancer"
+  type    = list(string)
+  default = []
+}
