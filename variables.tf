@@ -121,7 +121,7 @@ variable "image" {
 variable "cpu" {
   description = "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html"
   type        = number
-  default     = 512
+  default     = 256
 }
 
 variable "matcher" {
@@ -133,7 +133,7 @@ variable "matcher" {
 variable "memory" {
   description = "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html"
   type        = number
-  default     = 1024
+  default     = 512
 }
 
 variable "desired_count" {
@@ -581,12 +581,6 @@ variable "availability_zone_rebalancing" {
   description = "https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service#availability_zone_rebalancing-1"
   type        = string
   default     = null
-}
-
-variable "enable_path_routing" {
-  description = "Enable path routing for the load balancer"
-  type    = bool
-  default = false
 }
 
 variable "path_patterns" {
