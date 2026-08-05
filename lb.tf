@@ -96,7 +96,7 @@ resource "aws_lb_listener_rule" "this" {
   }
 
   dynamic "condition" {
-    for_each = var.enable_path_routing && length(var.path_patterns) > 0 ? [1] : []
+    for_each = length(var.path_patterns) > 0 ? [1] : []
 
     content {
       path_pattern {
