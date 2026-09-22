@@ -19,6 +19,10 @@ resource "aws_cloudwatch_event_rule" "ecs_deployment" {
       "lastStatus" : ["RUNNING"]
     }
   })
+
+  lifecycle {
+    ignore_changes = [region]
+  }
 }
 
 resource "aws_cloudwatch_event_target" "send_to_central_bus" {
@@ -26,6 +30,10 @@ resource "aws_cloudwatch_event_target" "send_to_central_bus" {
   rule     = aws_cloudwatch_event_rule.ecs_deployment[0].name
   arn      = var.central_bus # central bus ARN
   role_arn = aws_iam_role.eventbridge_cross_account[0].arn
+
+  lifecycle {
+    ignore_changes = [region]
+  }
 }
 
 resource "aws_iam_role" "eventbridge_cross_account" {

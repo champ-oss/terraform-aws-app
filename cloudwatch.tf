@@ -5,6 +5,6 @@ resource "aws_cloudwatch_log_group" "this" {
   tags              = merge(local.tags, var.tags)
 
   lifecycle {
-    ignore_changes = [name]
+    ignore_changes = [name, region]
   }
 }

@@ -5,6 +5,10 @@ resource "aws_efs_file_system" "this" {
   tags = merge(local.tags, var.tags, {
     Name = "${var.git}-${var.name}"
   })
+
+  lifecycle {
+    ignore_changes = [region]
+  }
 }
 
 resource "aws_security_group" "efs" {
@@ -14,6 +18,10 @@ resource "aws_security_group" "efs" {
   vpc_id      = var.vpc_id
 
   tags = merge(local.tags, var.tags)
+
+  lifecycle {
+    ignore_changes = [region]
+  }
 }
 
 resource "aws_security_group_rule" "efs_from_ecs" {
@@ -27,6 +35,10 @@ resource "aws_security_group_rule" "efs_from_ecs" {
   from_port                = 2049
   to_port                  = 2049
   protocol                 = "tcp"
+
+  lifecycle {
+    ignore_changes = [region]
+  }
 }
 
 resource "aws_efs_mount_target" "this" {
@@ -35,6 +47,10 @@ resource "aws_efs_mount_target" "this" {
   file_system_id  = aws_efs_file_system.this[0].id
   subnet_id       = each.value
   security_groups = [aws_security_group.efs[0].id]
+
+  lifecycle {
+    ignore_changes = [region]
+  }
 }
 
 resource "aws_efs_access_point" "this" {
@@ -64,4 +80,8 @@ resource "aws_efs_access_point" "this" {
   }
 
   tags = merge(local.tags, var.tags)
+
+  lifecycle {
+    ignore_changes = [region]
+  }
 }

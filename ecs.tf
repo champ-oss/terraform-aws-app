@@ -93,6 +93,10 @@ resource "aws_ecs_task_definition" "this" {
   }
 
   tags = merge(local.tags, var.tags)
+
+  lifecycle {
+    ignore_changes = [region]
+  }
 }
 
 resource "aws_ecs_service" "this" {
@@ -128,7 +132,7 @@ resource "aws_ecs_service" "this" {
   }
 
   lifecycle {
-    ignore_changes = [desired_count]
+    ignore_changes = [desired_count, region]
   }
 }
 
@@ -158,6 +162,6 @@ resource "aws_ecs_service" "disabled_load_balancer" {
   }
 
   lifecycle {
-    ignore_changes = [desired_count]
+    ignore_changes = [desired_count, region]
   }
 }
