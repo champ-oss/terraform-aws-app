@@ -93,6 +93,10 @@ resource "aws_ecs_task_definition" "this" {
   }
 
   tags = merge(local.tags, var.tags)
+
+  lifecycle {
+    ignore_changes = [region]
+  }
 }
 
 resource "aws_ecs_service" "this" {
