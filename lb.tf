@@ -27,7 +27,6 @@ resource "aws_lb_target_group" "this" {
   }
 
   lifecycle {
-    ignore_changes        = [region]
     create_before_destroy = true
   }
 }
@@ -115,10 +114,6 @@ resource "aws_lb_listener_rule" "this" {
       }
     }
   }
-
-  lifecycle {
-    ignore_changes = [region]
-  }
 }
 
 resource "aws_lb_listener_rule" "public_healthcheck" {
@@ -149,9 +144,5 @@ resource "aws_lb_listener_rule" "public_healthcheck" {
       key   = var.healthcheck_query_parameter
       value = random_password.healthcheck[0].result
     }
-  }
-
-  lifecycle {
-    ignore_changes = [region]
   }
 }

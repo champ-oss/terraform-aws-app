@@ -17,10 +17,6 @@ resource "aws_cloudwatch_metric_alarm" "cpu_avg_utilization" {
     ClusterName = var.cluster
     ServiceName = var.name
   }
-
-  lifecycle {
-    ignore_changes = [region]
-  }
 }
 
 resource "aws_cloudwatch_metric_alarm" "memory_avg_utilization" {
@@ -41,9 +37,5 @@ resource "aws_cloudwatch_metric_alarm" "memory_avg_utilization" {
   dimensions = {
     ClusterName = var.cluster
     ServiceName = var.name
-  }
-
-  lifecycle {
-    ignore_changes = [region]
   }
 }

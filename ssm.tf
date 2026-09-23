@@ -18,10 +18,6 @@ resource "aws_ssm_parameter" "this" {
   value       = each.value.plaintext[each.key]
   overwrite   = var.overwrite_ssm
   tags        = merge(local.tags, var.tags)
-
-  lifecycle {
-    ignore_changes = [region]
-  }
 }
 
 resource "aws_ssm_parameter" "dns" {
@@ -37,7 +33,6 @@ resource "aws_ssm_parameter" "dns" {
   }, local.tags, var.tags)
 
   lifecycle {
-    ignore_changes        = [region]
     create_before_destroy = true
   }
 }

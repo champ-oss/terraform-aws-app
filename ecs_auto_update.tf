@@ -13,10 +13,6 @@ resource "aws_cloudwatch_event_rule" "trigger_step_function" {
       "image-tag"       = [element(split(":", var.image), 1)],
     }
   })
-
-  lifecycle {
-    ignore_changes = [region]
-  }
 }
 
 resource "aws_cloudwatch_event_target" "step_function_target" {
@@ -26,10 +22,6 @@ resource "aws_cloudwatch_event_target" "step_function_target" {
   role_arn       = aws_iam_role.eventbridge_role[0].arn
   event_bus_name = "default"
   input_path     = "$.detail"
-
-  lifecycle {
-    ignore_changes = [region]
-  }
 }
 
 # IAM Role for Step Functions
@@ -266,8 +258,4 @@ resource "aws_sfn_state_machine" "this" {
     }
   })
   role_arn = aws_iam_role.step_functions_role[0].arn
-
-  lifecycle {
-    ignore_changes = [region]
-  }
 }

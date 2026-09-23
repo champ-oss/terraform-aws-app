@@ -11,7 +11,6 @@ resource "aws_appautoscaling_target" "this" {
     ignore_changes = [
       tags,     # https://github.com/hashicorp/terraform-provider-aws/issues/31261#issuecomment-2333629562
       tags_all, # https://github.com/hashicorp/terraform-provider-aws/issues/31261#issuecomment-2333629562
-      region,
     ]
   }
 }
@@ -34,10 +33,6 @@ resource "aws_appautoscaling_policy" "this" {
     target_value       = var.autoscaling_target_value
     scale_in_cooldown  = var.scale_in_cooldown
     scale_out_cooldown = var.scale_out_cooldown
-  }
-
-  lifecycle {
-    ignore_changes = [region]
   }
 }
 

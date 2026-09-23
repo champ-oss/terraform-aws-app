@@ -132,7 +132,7 @@ resource "aws_ecs_service" "this" {
   }
 
   lifecycle {
-    ignore_changes = [desired_count, region]
+    ignore_changes = [desired_count]
   }
 }
 
@@ -162,6 +162,6 @@ resource "aws_ecs_service" "disabled_load_balancer" {
   }
 
   lifecycle {
-    ignore_changes = [desired_count, region]
+    ignore_changes = [desired_count]
   }
 }
