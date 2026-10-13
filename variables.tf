@@ -585,6 +585,12 @@ variable "availability_zone_rebalancing" {
 
 variable "path_patterns" {
   description = "List of path patterns for the load balancer"
-  type    = list(string)
-  default = []
+  type        = list(string)
+  default     = []
+}
+
+variable "path_pattern_regex_values" {
+  description = "List of regex path patterns for the load balancer. Cannot be combined with path_patterns. https://docs.aws.amazon.com/elasticloadbalancing/latest/application/rule-condition-types.html#path-conditions"
+  type        = list(string)
+  default     = []
 }
