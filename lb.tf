@@ -96,11 +96,12 @@ resource "aws_lb_listener_rule" "this" {
   }
 
   dynamic "condition" {
-    for_each = length(var.path_patterns) > 0 ? [1] : []
+    for_each = length(var.path_patterns) > 0 || length(var.path_pattern_regex_values) > 0 ? [1] : []
 
     content {
       path_pattern {
-        values = var.path_patterns
+        values       = length(var.path_patterns) > 0 ? var.path_patterns : null
+        regex_values = length(var.path_pattern_regex_values) > 0 ? var.path_pattern_regex_values : null
       }
     }
   }
